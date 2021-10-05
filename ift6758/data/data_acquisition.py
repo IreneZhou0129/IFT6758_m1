@@ -129,15 +129,15 @@ def generate_game_id(season, game_type, game_number):
                 game_number - {game_number}")
         raise Exception
 
-def get_data(only_playoffs = False):
+def get_data():
     """
     Download data from the 2016-17 season all the way up to the 2020-21 season.
 
     Parameters:
-        only_playoffs(bool): Defaults to False.
+        None
 
     Returns:
-        Nont
+        None
     """
     t0=time.time()
     game_id = ""
@@ -159,20 +159,56 @@ def get_data(only_playoffs = False):
         # how many games happened
         regular_games = teams*82//2
 
-        # get both regular season and playoffs data
-        if not only_playoffs:
-            # ============================
-            # regular season
-            # ============================
-            regular_data_path = f"{data_local_path}/type_regular/{year}"   
+        # ============================
+        # regular season
+        # ============================
+        regular_data_path = f"{data_local_path}/type_regular/{year}"   
 
-            for game in range(regular_games):
+        for game in range(regular_games):
 
-                # convert a number to a 4-digit string: 5 -> "0005", 123 -> "0123"
-                game_number = str(game).zfill(4)
+            # convert a number to a 4-digit string: 5 -> "0005", 123 -> "0123"
+            game_number = str(game).zfill(4)
 
-                game_id = generate_game_id(year, type_regular, game_number)
-                
+            game_id = generate_game_id(year, type_regular, game_number)
+            
+            response = requests.get(f"https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live/")
+            data = response.json()
+
+            # skip the empty game info
+            if "message" in data and data["message"] == "Game data couldn't be found":
+                continue
+
+            # create file path if it doesn't exist
+            filename = f"{regular_data_path}/{game_id}.json"
+            dirname = os.path.dirname(filename)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+
+            # write data to local
+            with open(filename, 'w+') as f:
+                json.dump(data, f, sort_keys=True, indent=4)
+
+        # TODO: for the purpose of discussion only, need to remove it before submit to main
+        # '0:20:39'
+     
+
+        # ============================
+        # playoffs
+        # ============================ 
+        playoffs_data_path = f"{data_local_path}/playoffs/{year}"  
+
+        # get all possible combinations of last three digits
+        playoff_numbers_dict = get_playoff_number()
+
+        # second_digit is 0, 1, 2, and 3
+        for second_digit in range(4):
+
+            two_d_nparray = playoff_numbers_dict["2nd-digit"][str(second_digit+1)]
+            
+            for three_digit in np.nditer(two_d_nparray):
+    
+                game_id = generate_game_id(year, type_playoffs, f"0{str(three_digit)}")
+
                 response = requests.get(f"https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live/")
                 data = response.json()
 
@@ -181,7 +217,7 @@ def get_data(only_playoffs = False):
                     continue
 
                 # create file path if it doesn't exist
-                filename = f"{regular_data_path}/{game_id}.json"
+                filename = f"{playoffs_data_path}/{game_id}.json"
                 dirname = os.path.dirname(filename)
                 if not os.path.exists(dirname):
                     os.makedirs(dirname)
@@ -189,48 +225,9 @@ def get_data(only_playoffs = False):
                 # write data to local
                 with open(filename, 'w+') as f:
                     json.dump(data, f, sort_keys=True, indent=4)
-
-        # TODO: for the purpose of discussion only, need to remove it before submit to main
-        # '0:20:39'
-     
-        # want only playoffs data
-        else:
-            # ============================
-            # playoffs
-            # ============================ 
-            playoffs_data_path = f"{data_local_path}/playoffs/{year}"  
-
-            # get all possible combinations of last three digits
-            playoff_numbers_dict = get_playoff_number()
-
-            # second_digit is 0, 1, 2, and 3
-            for second_digit in range(4):
-
-                two_d_nparray = playoff_numbers_dict["2nd-digit"][str(second_digit+1)]
-                
-                for three_digit in np.nditer(two_d_nparray):
-        
-                    game_id = generate_game_id(year, type_playoffs, f"0{str(three_digit)}")
-
-                    response = requests.get(f"https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live/")
-                    data = response.json()
-
-                    # skip the empty game info
-                    if "message" in data and data["message"] == "Game data couldn't be found":
-                        continue
-
-                    # create file path if it doesn't exist
-                    filename = f"{playoffs_data_path}/{game_id}.json"
-                    dirname = os.path.dirname(filename)
-                    if not os.path.exists(dirname):
-                        os.makedirs(dirname)
-
-                    # write data to local
-                    with open(filename, 'w+') as f:
-                        json.dump(data, f, sort_keys=True, indent=4)
-                        
-                    # TODO: for the purpose of discussion only, need to remove it before submit to main
-                    # total time: 0:01:39
+                    
+                # TODO: for the purpose of discussion only, need to remove it before submit to main
+                # total time: 0:01:39
     
     t1=time.time()
     import datetime 
@@ -240,5 +237,5 @@ def get_data(only_playoffs = False):
 
 # generate_game_id("2017", "02", "1234")
 # get_playoff_number()
-# get_data(only_playoffs=True)
+
 get_data()
