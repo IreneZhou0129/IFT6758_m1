@@ -164,7 +164,7 @@ def get_data():
         # ============================
         regular_data_path = f"{data_local_path}/type_regular/{year}"   
 
-        for game in range(regular_games):
+        for game in range(regular_games+1):
 
             # convert a number to a 4-digit string: 5 -> "0005", 123 -> "0123"
             game_number = str(game).zfill(4)
