@@ -7,8 +7,8 @@ import os
 
 def q4():
     years = [2016, 2017, 2018, 2019, 2020]
-    game_types = ['type_regular', 'playoffs']
-    columns = ['Date & Time', 'Period', 'Period Time', 'Period Time Remaining', 'Period Type', 
+    game_types = ['regular_season', 'playoffs']
+    columns = ['eventIdx', 'Date & Time', 'Period', 'Period Time', 'Period Time Remaining', 'Period Type', 
                'Game ID', 'Team Name', 'Shot or Goal', 'X-Coordinate', 'Y-Coordinate', 
                'Shooter Name', 'Goalie Name', 'Scorer Name', 'Shot Type', 'Was Net Empty', 
                'Goalie Strength']
@@ -41,11 +41,13 @@ def q4():
 
                             team_name = all_plays[i]['team']['name']
 
+                            eventIdx = all_plays[i]['about']['eventIdx']
+
                             coord_x = 'NA'
                             coord_y = 'NA'
-                            if 'coorinates' in all_plays[i]:
-                                coord_x = all_plays[i]['coordinates']['x']
-                                coord_y = all_plays[i]['coordinates']['y']
+                            if 'coordinates' in all_plays[i]:
+                                coord_x = all_plays[i]['coordinates'].get('x')
+                                coord_y = all_plays[i]['coordinates'].get('y')
 
                             scorer_name = 'NA'
                             for player in all_plays[i]['players']:
@@ -68,7 +70,7 @@ def q4():
 
                                 goalie_strength = all_plays[i]['result']['strength']['name']   
 
-                            row_data = [date_time, period, period_time, period_time_remaining, 
+                            row_data = [eventIdx, date_time, period, period_time, period_time_remaining, 
                                         period_type, game_id, team_name, event, coord_x, coord_y, 
                                         shooter_name, goalie_name, scorer_name, shot_type, 
                                         was_net_empty, goalie_strength]
