@@ -9,7 +9,7 @@ def q4():
     years = [2016, 2017, 2018, 2019, 2020]
     game_types = ['regular_season', 'playoffs']
     columns = ['eventIdx', 'Date & Time', 'Period', 'Period Time', 'Period Time Remaining', 'Period Type', 
-               'Game ID', 'Team Name', 'Shot or Goal', 'X-Coordinate', 'Y-Coordinate', 
+               'Game ID', 'Team Name', 'Home or Away', 'Shot or Goal', 'X-Coordinate', 'Y-Coordinate', 
                'Shooter Name', 'Goalie Name', 'Scorer Name', 'Shot Type', 'Was Net Empty', 
                'Goalie Strength']
 
@@ -27,6 +27,8 @@ def q4():
                     all_plays = loaded_json['liveData']['plays']['allPlays']
 
                     data = []
+                    
+                    home_team = loaded_json['gameData']['teams']['home'].get('name')
 
                     for i in range(len(all_plays)):
                         event = all_plays[i]['result']['event']
@@ -40,6 +42,11 @@ def q4():
                             period_type = all_plays[i]['about']['periodType']
 
                             team_name = all_plays[i]['team']['name']
+                            
+                            if home_team == team_name:
+                                home_or_away = 'Home'
+                            else:
+                                home_or_away = 'Away'
 
                             eventIdx = all_plays[i]['about']['eventIdx']
 
@@ -71,7 +78,7 @@ def q4():
                                 goalie_strength = all_plays[i]['result']['strength']['name']   
 
                             row_data = [eventIdx, date_time, period, period_time, period_time_remaining, 
-                                        period_type, game_id, team_name, event, coord_x, coord_y, 
+                                        period_type, game_id, team_name, home_or_away, event, coord_x, coord_y, 
                                         shooter_name, goalie_name, scorer_name, shot_type, 
                                         was_net_empty, goalie_strength]
 
