@@ -74,9 +74,6 @@ def goal_vs_shot_type():
 
 # analyze the relationship between goal and distance
 def goal_vs_distance():
-    # analyze the relationship between goal and shot type
-
-    # Calculate the distance based on the X-Coordinate
     """
     X_Left_Net: -89
     Y_Left_Net: 0
@@ -86,16 +83,21 @@ def goal_vs_distance():
     # home: right
 
     # Select three years (2018, 2019, 2020) to analyze
+    # year 2018
     df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
 
     # Simplify column name
     df = df.rename(columns={'X-Coordinate': 'X', 'Y-Coordinate': 'Y'})
 
-    # Calculate the distance using different methods based on X-coordinate
+    # Calculate the distance usind different methods based on X-coordinate
     df['Distance'] = np.where(df.X < 0., np.sqrt((df.X + 89.) ** 2 + df.Y ** 2), np.sqrt((df.X - 89.) ** 2 + df.Y ** 2))
     print(df.head(10))
 
-    # df2 = df.pivot_table(index='Distance', columns='Type', aggfunc='size', fill_value=0)
+    # Generate the histogram of chance of goal vs distance
+    df2 = df.pivot_table(index='Distance', columns='Shot or Goal', aggfunc='size', fill_value=0)
+    bin_range = range(0, int(df2.index.max())+1, 10)
+    df3 = df2.groupby(pd.cut(df2.index, bins=bin_range)).sum()
+    df3['Goal'].div(df3.sum(1)).plot.bar(width=1)
 
 goal_vs_distance()
 
