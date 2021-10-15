@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 /environment.yml
+data_acquisition.py
+q3.ipynb
+q4_clean_data.py
