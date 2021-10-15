@@ -7,6 +7,7 @@ import os
 import glob
 import chardet
 import matplotlib.pyplot as plt
+import math
 
 extension = 'csv'
 years = [2016, 2017, 2018, 2019, 2020]
@@ -58,7 +59,7 @@ def combine_csv():
 # combine_csv()
 
 def goal_vs_shot_type():
-    # Select one year (2018) to analyze the relationship between goal and shot type
+    # Select one year (2018) to analyze
     df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
     # df.head(10)
 
@@ -71,8 +72,31 @@ def goal_vs_shot_type():
     # group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["blue", "red"], legend=False)
     group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["red", "blue"], legend=False, width=1)
 
-goal_vs_shot_type()
+# analyze the relationship between goal and distance
+def goal_vs_distance():
+    # analyze the relationship between goal and shot type
 
+    # Calculate the distance based on the X-Coordinate
+    """
+    X_Left_Net: -89
+    Y_Left_Net: 0
+    X_Right_Net: 89
+    Y_Right_Net: 0
+    """
+    # home: right
 
+    # Select three years (2018, 2019, 2020) to analyze
+    df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
+
+    # Simplify column name
+    df = df.rename(columns={'X-Coordinate': 'X', 'Y-Coordinate': 'Y'})
+
+    # Calculate the distance using different methods based on X-coordinate
+    df['Distance'] = np.where(df.X < 0., np.sqrt((df.X + 89.) ** 2 + df.Y ** 2), np.sqrt((df.X - 89.) ** 2 + df.Y ** 2))
+    print(df.head(10))
+
+    # df2 = df.pivot_table(index='Distance', columns='Type', aggfunc='size', fill_value=0)
+
+goal_vs_distance()
 
 
