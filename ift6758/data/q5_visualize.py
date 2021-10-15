@@ -55,22 +55,23 @@ def combine_csv():
         combined_csv = pd.concat([pd.read_csv(f, encoding='ISO-8859-1') for f in combine_files])
         combined_csv.to_csv(f"{year}.csv", index=False, encoding='ISO-8859-1')
 
-combine_csv()
+# combine_csv()
 
-# def shot_type_goal():
-#     df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
-#     df.head(10)
-#
-#     # Group by 'Shot Type' and 'Shot or Goal', add a 'Count' for the sum up
-#     df['Count'] = 1
-#     group_data = df.groupby(['Shot Type', 'Shot or Goal'])['Count'].sum().reset_index(name="Count")
-#     print(group_data)
-#
-#     # Generate the figure for Q5.1
-#     # group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["blue", "red"], legend=False)
-#     group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["red", "blue"], legend=False, width=1)
-#
-# shot_type_goal()
+def goal_vs_shot_type():
+    # Select one year (2018) to analyze the relationship between goal and shot type
+    df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
+    # df.head(10)
+
+    # Group by 'Shot Type' and 'Shot or Goal', add a 'Count' for the sum up
+    df['Count'] = 1
+    group_data = df.groupby(['Shot Type', 'Shot or Goal'])['Count'].sum().reset_index(name="Count")
+    print(group_data)
+
+    # Generate the figure for Q5.1
+    # group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["blue", "red"], legend=False)
+    group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["red", "blue"], legend=False, width=1)
+
+goal_vs_shot_type()
 
 
 
