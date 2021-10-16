@@ -73,25 +73,29 @@ def goal_vs_shot_type():
     group_data.pivot("Shot Type","Shot or Goal","Count")[["Shot", "Goal"]].plot.bar(stacked=True, color=["red", "blue"], legend=False, width=1)
 
 # analyze the relationship between goal and distance
-def goal_vs_distance():
+def goal_vs_distance(year):
+    # Select three years (2018, 2019, 2020) to analyze
+    # year 2018
+    df = pd.read_csv(fr'D:\Python\IFT6758\Visualize\{year}.csv', encoding='ISO-8859-1')
+
+    # Simplify column name
+    df = df.rename(columns={'X-Coordinate': 'X', 'Y-Coordinate': 'Y', 'Home or Away': 'Home'})
+
+    # Calculate Distance
+    # df['Distance'] = np.where((df.Home=='Home') ^ (df.Period%2==1), np.sqrt((df.X + 89.) ** 2 + df.Y ** 2), np.sqrt((df.X - 89.) ** 2 + df.Y ** 2))
+    # df['Distance'] = np.where(df.X < 0., np.sqrt((df.X + 89.) ** 2 + df.Y ** 2), np.sqrt((df.X - 89.) ** 2 + df.Y ** 2))
     """
     X_Left_Net: -89
     Y_Left_Net: 0
     X_Right_Net: 89
     Y_Right_Net: 0
     """
-    # home: right
-
-    # Select three years (2018, 2019, 2020) to analyze
-    # year 2018
-    df = pd.read_csv(r'D:\Python\IFT6758\Visualize\2018.csv', encoding='ISO-8859-1')
-
-    # Simplify column name
-    df = df.rename(columns={'X-Coordinate': 'X', 'Y-Coordinate': 'Y'})
-
-    # Calculate the distance usind different methods based on X-coordinate
-    df['Distance'] = np.where(df.X < 0., np.sqrt((df.X + 89.) ** 2 + df.Y ** 2), np.sqrt((df.X - 89.) ** 2 + df.Y ** 2))
-    print(df.head(10))
+    home, p_odd = df.Home == 'Home', df.Period % 2 ==1
+    condition=[home&p_odd, home&~p_odd, ~home&p_odd]
+    # if Home and odd period, Net is left
+    choices = [np.sqrt((df.X+89.)**2 + df.Y**2), np.sqrt((df.X-89.)**2 + df.Y**2), np.sqrt((df.X+89.)**2 + df.Y**2)]
+    df['Distance']=np.select(condition, choices, np.sqrt((df.X-89.)**2 + df.Y**2))
+    print(df.head(2))
 
     # Generate the histogram of chance of goal vs distance
     df2 = df.pivot_table(index='Distance', columns='Shot or Goal', aggfunc='size', fill_value=0)
@@ -99,6 +103,7 @@ def goal_vs_distance():
     df3 = df2.groupby(pd.cut(df2.index, bins=bin_range)).sum()
     df3['Goal'].div(df3.sum(1)).plot.bar(width=1)
 
-goal_vs_distance()
+goal_vs_distance(2018)
+
 
 
