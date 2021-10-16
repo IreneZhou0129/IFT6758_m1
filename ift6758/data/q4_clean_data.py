@@ -15,10 +15,10 @@ def q4():
 
     for year in years:
         for game_type in game_types:
-            for file in os.listdir(f'../../../JSON_data/{game_type}/{year}'):
+            for file in os.listdir(f'/Users/xiaoxinzhou/Documents/IFT6758_JSON_data/{game_type}/{year}'):
                 if file[-5:] == '.json':
                     # Opening JSON file
-                    f = open(f'../../../JSON_data/{game_type}/{year}/{file}')
+                    f = open(f'/Users/xiaoxinzhou/Documents/IFT6758_JSON_data/{game_type}/{year}/{file}')
 
                     game_id = int(file[:-5])
 
@@ -89,7 +89,7 @@ def q4():
                             data.append(row_data)
 
                 # create file path if it doesn't exist
-                filename = f'../../../CSV_data/{game_type}/{year}/{game_id}.csv'
+                filename = f'/Users/xiaoxinzhou/Documents/IFT6758_CSV_data/{game_type}/{year}/{game_id}.csv'
                 dirname = os.path.dirname(filename)
                 if not os.path.exists(dirname):
                     os.makedirs(dirname)

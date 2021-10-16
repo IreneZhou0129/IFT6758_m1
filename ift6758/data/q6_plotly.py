@@ -7,6 +7,7 @@ import plotly.offline as pyo
 import plotly.express as px  # (version 4.7.0 or higher)
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
+from whitenoise import WhiteNoise
 
 def get_league_average_table(year):
     
@@ -80,18 +81,19 @@ def get_league_average_table(year):
 
 def get_team_table(team, year):
     
-    csv_path = f'/Users/xiaoxinzhou/Documents/IFT6758_CSV_data/regular_season/{year}'
+    # csv_path = f'/Users/xiaoxinzhou/Documents/IFT6758_CSV_data/regular_season/{year}'
+    csv_path = f'static/CSV_data/regular_season/{year}'
 
     team_table = np.zeros((85, 200))
 
     for filename in os.listdir(csv_path):
 
-        #open corresponding json file and get start home court side
-        f = open(f'/Users/xiaoxinzhou/Documents/IFT6758_JSON_data/regular_season/{year}/{filename[:-4]}.json')
-        loaded_json = json.load(f)
-        home_side = loaded_json['liveData']['linescore']['periods'][0]['home'].get('rinkSide')
-        home_team = loaded_json['gameData']['teams']['home'].get('name')
-        away_team = loaded_json['gameData']['teams']['away'].get('name')
+        #open corresponding csv file and get start home court side
+        file_df = pd.read_csv(f'{csv_path}/{filename}')
+        
+        home_side = file_df['Home Rink Side'][0]
+        home_team = file_df.loc[file_df['Home or Away']=='Home','Team Name'].iloc[0]
+        away_team = file_df.loc[file_df['Home or Away']=='Away','Team Name'].iloc[0]
         
         if team == home_team or team == away_team:
             with open(csv_path + '/' + filename) as csvfile:
@@ -169,6 +171,7 @@ for t in teams_set:
 
 app = Dash(__name__)
 server = app.server
+server.wsgi_app = WhiteNoise(server.wsgi_app, root='static/')
 
 # ------------------------------------------------------------------------------
 # App layout
