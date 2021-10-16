@@ -11,7 +11,7 @@ def q4():
     columns = ['eventIdx', 'Date & Time', 'Period', 'Period Time', 'Period Time Remaining', 'Period Type', 
                'Game ID', 'Team Name', 'Home or Away', 'Shot or Goal', 'X-Coordinate', 'Y-Coordinate', 
                'Shooter Name', 'Goalie Name', 'Scorer Name', 'Shot Type', 'Was Net Empty', 
-               'Goalie Strength']
+               'Goalie Strength', 'Home Rink Side']
 
     for year in years:
         for game_type in game_types:
@@ -29,6 +29,10 @@ def q4():
                     data = []
                     
                     home_team = loaded_json['gameData']['teams']['home'].get('name')
+                    
+                    home_side = 'NA'
+                    if len(loaded_json['liveData']['linescore']['periods']) > 0:
+                        home_side = loaded_json['liveData']['linescore']['periods'][0]['home'].get('rinkSide')
 
                     for i in range(len(all_plays)):
                         event = all_plays[i]['result']['event']
@@ -80,7 +84,7 @@ def q4():
                             row_data = [eventIdx, date_time, period, period_time, period_time_remaining, 
                                         period_type, game_id, team_name, home_or_away, event, coord_x, coord_y, 
                                         shooter_name, goalie_name, scorer_name, shot_type, 
-                                        was_net_empty, goalie_strength]
+                                        was_net_empty, goalie_strength, home_side]
 
                             data.append(row_data)
 
