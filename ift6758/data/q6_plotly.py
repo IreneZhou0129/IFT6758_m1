@@ -3,6 +3,7 @@ import csv
 import json
 import os
 import pandas as pd
+import plotly.offline as pyo
 import plotly.express as px  # (version 4.7.0 or higher)
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
@@ -12,15 +13,15 @@ def get_league_average_table(year):
     csv_path = f'/Users/xiaoxinzhou/Documents/IFT6758_CSV_data/regular_season/{year}'
 
     league_total_table = np.zeros((85, 200))
-
+    
     for filename in os.listdir(csv_path):
-        # print(filename)
         # df = pd.read_csv(f'{csv_path}/{filename}')
 
         with open(csv_path + '/' + filename) as csvfile:
             data = csv.DictReader(csvfile)
             
             #open corresponding json file and get start home court side
+            
             f = open(f'/Users/xiaoxinzhou/Documents/IFT6758_JSON_data/regular_season/{year}/{filename[:-4]}.json')
             loaded_json = json.load(f)
             home_side = loaded_json['liveData']['linescore']['periods'][0]['home'].get('rinkSide')
@@ -84,8 +85,6 @@ def get_team_table(team, year):
     team_table = np.zeros((85, 200))
 
     for filename in os.listdir(csv_path):
-        # print(filename)
-        # df = pd.read_csv(f'{csv_path}/{filename}')
 
         #open corresponding json file and get start home court side
         f = open(f'/Users/xiaoxinzhou/Documents/IFT6758_JSON_data/regular_season/{year}/{filename[:-4]}.json')
@@ -147,8 +146,21 @@ def get_team_table(team, year):
 
     return team_table
 
-team_table = get_team_table('Colorado Avalanche', '2016')        
-teams_set = {'Philadelphia Flyers', 'Vancouver Canucks', 'St. Louis Blues', 'Ottawa Senators', 'Toronto Maple Leafs', 'Vegas Golden Knights', 'New York Rangers', 'New York Islanders', 'New Jersey Devils', 'Winnipeg Jets', 'Chicago Blackhawks', 'Boston Bruins', 'Detroit Red Wings', 'San Jose Sharks', 'Anaheim Ducks', 'Florida Panthers', 'Montréal Canadiens', 'Columbus Blue Jackets', 'Calgary Flames', 'Nashville Predators', 'Buffalo Sabres', 'Edmonton Oilers', 'Tampa Bay Lightning', 'Minnesota Wild', 'Colorado Avalanche', 'Dallas Stars', 'Los Angeles Kings', 'Carolina Hurricanes', 'Arizona Coyotes', 'Washington Capitals', 'Pittsburgh Penguins'}
+team_table = get_team_table('Colorado Avalanche', '2016')    
+
+df = pd.DataFrame(team_table)
+
+teams_set = {'Philadelphia Flyers', 'Vancouver Canucks', 'St. Louis Blues', 
+            'Ottawa Senators', 'Toronto Maple Leafs', 'Vegas Golden Knights', 
+            'New York Rangers', 'New York Islanders', 'New Jersey Devils', 
+            'Winnipeg Jets', 'Chicago Blackhawks', 'Boston Bruins', 
+            'Detroit Red Wings', 'San Jose Sharks', 'Anaheim Ducks', 
+            'Florida Panthers', 'Montréal Canadiens', 'Columbus Blue Jackets', 
+            'Calgary Flames', 'Nashville Predators', 'Buffalo Sabres', 
+            'Edmonton Oilers', 'Tampa Bay Lightning', 'Minnesota Wild', 
+            'Colorado Avalanche', 'Dallas Stars', 'Los Angeles Kings', 
+            'Carolina Hurricanes', 'Arizona Coyotes', 'Washington Capitals', 
+            'Pittsburgh Penguins'}
 teams_list = []
 for t in teams_set:
     teams_list.append(
@@ -156,15 +168,6 @@ for t in teams_set:
     )
 
 app = Dash(__name__)
-
-# -- Import and clean data (importing csv into pandas)
-# df = pd.read_csv("intro_bees.csv")
-# df = pd.read_csv("https://raw.githubusercontent.com/Coding-with-Adam/Dash-by-Plotly/master/Other/Dash_Introduction/intro_bees.csv")
-
-# df = df.groupby(['State', 'ANSI', 'Affected by', 'Year', 'state_code'])[['Pct of Colonies Impacted']].mean()
-# df.reset_index(inplace=True)
-# print(df[:5])
-df = pd.DataFrame(team_table)
 
 # ------------------------------------------------------------------------------
 # App layout
@@ -213,41 +216,23 @@ def update_graph(option_slctd_year,option_slctd_team):
     dff = pd.DataFrame(get_team_table(option_slctd_team, option_slctd_year))
     print(dff.head())
 
-    # Plotly Express
-    fig = px.scatter(
-        data_frame=dff,
-        # locationmode='USA-states',
-        # locations='state_code',
-        # scope="usa",
-        # color='Pct of Colonies Impacted',
-        # hover_data=['State',ct of Colonies Impacted'],
-        #color_continuous_scale=px.colors.sequential.YlOrRd,
-        # labels={'Pct of Colonies Impacted': '% of Bee Colonies'},
-        # template='plotly_dark'
-    )
+    colorscale = [[0, 'lightsalmon'], [0.5, 'mediumturquoise'], [1, 'gold']]
 
-    x = np.linespace(0,200,20)
-    y = 
-
-    fig = go.Figure(
-        data=go.Scatter(
-
-        )
-    )
-
-    fig.update_xaxes(
-        visible=True,
-        range=[0, 200 ]
-    )
-
-    fig.update_yaxes(
-        visible=True,
-        range=[0, 85 ]
-    )    
+    fig = go.Figure(data =
+        go.Contour(
+            z=dff,
+            contours=dict(
+            start=0,
+            end=8,
+            size=1,
+            ),
+            contours_coloring='heatmap',
+            colorscale=colorscale,
+            line_smoothing=0.85,
+            connectgaps=True, 
+        ))  
 
     return year_container, fig
-
-# app.run_server(debug=True)
 
 if __name__=='__main__':
     app.run_server(debug=True)
