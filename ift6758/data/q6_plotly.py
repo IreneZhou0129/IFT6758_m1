@@ -168,6 +168,7 @@ for t in teams_set:
     )
 
 app = Dash(__name__)
+server = app.server
 
 # ------------------------------------------------------------------------------
 # App layout
