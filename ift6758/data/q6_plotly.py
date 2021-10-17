@@ -89,7 +89,10 @@ def get_team_table(team, year):
 
         #open corresponding csv file and get start home court side
         file_df = pd.read_csv(f'{csv_path}/{filename}')
-        
+
+        if file_df.empty:
+            continue
+
         home_side = file_df['Home Rink Side'][0]
         home_team = file_df.loc[file_df['Home or Away']=='Home','Team Name'].iloc[0]
         away_team = file_df.loc[file_df['Home or Away']=='Away','Team Name'].iloc[0]
@@ -213,10 +216,9 @@ app.layout = html.Div([
 )
 def update_graph(option_slctd_year,option_slctd_team):
 
-    # calculate league average
-    league_average_table = get_league_average_table(option_slctd_year)
+    next_year = str(int(option_slctd_year)+1)
 
-    year_container = f"Current season: {option_slctd_year}-{option_slctd_year+1}\nTeam: {option_slctd_team}"
+    year_container = f"Current season: {option_slctd_year}-{next_year}\nTeam: {option_slctd_team}"
 
     dff = df.copy()
     dff = pd.DataFrame(get_team_table(option_slctd_team, option_slctd_year))
