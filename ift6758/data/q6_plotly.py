@@ -18,14 +18,18 @@ def get_league_average_table(year):
     league_total_table = np.zeros((85, 200))
     
     for filename in os.listdir(csv_path):
+        #open corresponding csv file and get start home court side
+        file_df = pd.read_csv(f'{csv_path}/{filename}')
+
+        if file_df.empty:
+            continue
+
+        home_side = file_df['Home Rink Side'][0]
+        home_team = file_df.loc[file_df['Home or Away']=='Home','Team Name'].iloc[0]
+        away_team = file_df.loc[file_df['Home or Away']=='Away','Team Name'].iloc[0]        
 
         with open(csv_path + '/' + filename) as csvfile:
             data = csv.DictReader(csvfile)
-            
-            #open corresponding csv file and get start home court side
-            file_df = pd.read_csv(f'{csv_path}/{filename}')
-            
-            home_side = file_df['Home Rink Side'][0]
                     
             for row in data:
 
@@ -76,7 +80,6 @@ def get_league_average_table(year):
 
     num_teams = 30 if int(year) == 2016 else 31
     league_average_table = league_total_table / num_teams
-    # print(league_average_table)
     return league_average_table
 
 def get_team_table(team, year):
@@ -150,6 +153,14 @@ def get_team_table(team, year):
 
     return team_table
 
+
+def get_excess_shots_table(team, year):
+    league_average_table = get_league_average_table(year)
+    team_table = get_team_table(team, year)
+    excess_shots_table = team_table - league_average_table
+
+    return excess_shots_table
+
 team_table = get_team_table('Colorado Avalanche', '2016')    
 
 df = pd.DataFrame(team_table)
@@ -221,7 +232,7 @@ def update_graph(option_slctd_year,option_slctd_team):
     year_container = f"Current season: {option_slctd_year}-{next_year}\nTeam: {option_slctd_team}"
 
     dff = df.copy()
-    dff = pd.DataFrame(get_team_table(option_slctd_team, option_slctd_year))
+    dff = pd.DataFrame(get_excess_shots_table(option_slctd_team, option_slctd_year))
 
     img=Image.open('static/nhl_rink.png')
 
