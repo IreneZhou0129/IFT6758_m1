@@ -128,9 +128,15 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+<<<<<<< HEAD
 /environment.yml
+data_acquisition.py
+q3.ipynb
+q4_clean_data.py
+=======
 .DS_Store
 *.pyc 
 .env
 venv
 
+>>>>>>> main

@@ -18,3 +18,4 @@ dependencies:
   - ipywidgets
   - jupyterlab>=3.0.0
   - ipdb
+  - gunicorn

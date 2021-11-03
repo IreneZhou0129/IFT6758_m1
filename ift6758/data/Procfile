@@ -1,0 +1,1 @@
+web: gunicorn q6_plotly:server
