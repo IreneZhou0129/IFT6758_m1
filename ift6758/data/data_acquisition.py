@@ -131,7 +131,7 @@ def generate_game_id(season, game_type, game_number):
 
 def get_data():
     """
-    Download data from the 2016-17 season all the way up to the 2020-21 season.
+    Download data from the 2015-16 season all the way up to the 2029-20 season.
 
     Parameters:
         None
@@ -143,18 +143,18 @@ def get_data():
     game_id = ""
 
     # save JSON outputs locally
-    data_local_path = "/Users/xiaoxinzhou/Documents/IFT6758_JSON_data"
+    data_local_path = "../../../m2_JSON_data"
 
-    years = ["2016", "2017", "2018", "2019", "2020"]
+    years = ["2015", "2016", "2017", "2018", "2019"]
 
     # game types
     type_regular = "02"
     type_playoffs = "03"
 
     for year in years:
-        # As the API mentions, there are 30 teams in 2016
-        # and 31 teams in 2017, 2018, 2019, and 2020 each.
-        teams = 30 if year == "2016" else 31
+        # As the API mentions, there are 30 teams in 2015, and 2016
+        # and 31 teams in 2017, 2018, and 2019 each.
+        teams = 30 if year == "2015" or year == "2016" else 31
         
         # how many games happened
         regular_games = teams*82//2
@@ -162,7 +162,7 @@ def get_data():
         # ============================
         # regular season
         # ============================
-        regular_data_path = f"{data_local_path}/type_regular/{year}"   
+        regular_data_path = f"{data_local_path}/regular_season/{year}"   
 
         for game in range(regular_games+1):
 
