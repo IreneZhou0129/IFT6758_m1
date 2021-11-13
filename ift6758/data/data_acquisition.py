@@ -72,25 +72,6 @@ def get_playoff_number():
         playoff_numbers_dict["2nd-digit"][str(i+1)] = playoff_numbers_matrix
         
     return playoff_numbers_dict
-        # TODO: for the purpose of discussion only, need to remove it before submit to main
-        # > playoff_numbers_dict
-        # {'2nd-digit': 
-        #     {'1': array([[111, 112, 113, 114, 115, 116, 117],
-        #             [121, 122, 123, 124, 125, 126, 127],
-        #             [131, 132, 133, 134, 135, 136, 137],
-        #             [141, 142, 143, 144, 145, 146, 147],
-        #             [151, 152, 153, 154, 155, 156, 157],
-        #             [161, 162, 163, 164, 165, 166, 167],
-        #             [171, 172, 173, 174, 175, 176, 177],
-        #             [181, 182, 183, 184, 185, 186, 187]]),
-        #     '2': array([[211, 212, 213, 214, 215, 216, 217],
-        #             [221, 222, 223, 224, 225, 226, 227],
-        #             [231, 232, 233, 234, 235, 236, 237],
-        #             [241, 242, 243, 244, 245, 246, 247]]),
-        #     '3': array([[311, 312, 313, 314, 315, 316, 317],
-        #             [321, 322, 323, 324, 325, 326, 327]]),
-        #     '4': array([[411, 412, 413, 414, 415, 416, 417]])}}
-
 
 def generate_game_id(season, game_type, game_number):
     """
@@ -143,7 +124,7 @@ def get_data():
     game_id = ""
 
     # save JSON outputs locally
-    data_local_path = "../../../m2_JSON_data"
+    data_local_path = "/Users/xiaoxinzhou/Documents/IFT6758_M2_JSON_data"
 
     years = ["2015", "2016", "2017", "2018", "2019"]
 
@@ -187,10 +168,6 @@ def get_data():
             # write data to local
             with open(filename, 'w+') as f:
                 json.dump(data, f, sort_keys=True, indent=4)
-
-        # TODO: for the purpose of discussion only, need to remove it before submit to main
-        # '0:20:39'
-     
 
         # ============================
         # playoffs
