@@ -10,6 +10,7 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 from sklearn.calibration import calibration_curve, CalibrationDisplay
 import xgboost as xgb
+from matplotlib.gridspec import GridSpec
 
 def read_dataset():
 
@@ -26,13 +27,13 @@ def read_dataset():
 
 def train(model_name, model_path, features=['Distance from Net']):
 
-    experiment = Experiment(
-        api_key = os.environ.get("COMET_API_KEY"),
-        project_name = 'milestone_2',
-        workspace='xiaoxin-zhou')
+    # experiment = Experiment(
+    #     api_key = os.environ.get("COMET_API_KEY"),
+    #     project_name = 'milestone_2',
+    #     workspace='xiaoxin-zhou')
 
-    Path('models/').mkdir(exist_ok=True)
-    experiment.log_model(model_name, model_path)
+    # Path('models/').mkdir(exist_ok=True)
+    # experiment.log_model(model_name, model_path)
 
     X, y = read_dataset()
 
@@ -60,9 +61,9 @@ def train(model_name, model_path, features=['Distance from Net']):
         'accuracy': accuracy
     }
 
-    experiment.log_dataset_hash(X_train)
-    experiment.log_parameters(params)
-    experiment.log_metrics(metrics_dict)
+    # experiment.log_dataset_hash(X_train)
+    # experiment.log_parameters(params)
+    # experiment.log_metrics(metrics_dict)
 
 # train('distance_and_angle', 
 #         'models/distance_and_angle.h5', 
@@ -197,67 +198,213 @@ def get_rate(df, function_type='goal_rate'):
 # ==========================================================================================
 # Question 3:
 # ==========================================================================================
+def plot_roc(X, y, feature_color_dict, model_type):
+
+    fig = plt.figure(figsize=(20, 20))
+    gs = GridSpec(4, 2)
+
+    ax_calibration_curve = fig.add_subplot(gs[:2, :2])    
+
+    for k,v in feature_color_dict.items():
+        
+        f = v[0]
+        color = v[1]
+        
+        if f != 'Random baseline':
+            X_train, X_test, y_train, y_test = train_test_split(X[f],y,test_size=0.20,random_state=50)
+            probs = get_prob(X, y, model_type, f)
+            is_goal = probs[:,1]                
+
+        # Random baseline
+        else:
+            is_goal = np.random.uniform(0,1,is_goal.shape[0])
+        
+        fpr, tpr, threshold = metrics.roc_curve(y_test, is_goal)
+        
+        roc_auc = metrics.auc(fpr, tpr)
+        
+        plt.plot(
+            fpr, 
+            tpr, 
+            color = color, 
+            label = f'{f} '+'AUC = %0.2f' % roc_auc)      
+    
+    plt.axis([0, 1, 0, 1])    
+        
+    plt.title('ROC Curves')
+    plt.legend()
+    plt.grid(True)
+
+
+def plot_goal_rate(X, y, feature_color_dict, model_type):
+    fig = plt.figure(figsize=(20, 20))
+    gs = GridSpec(4, 2)
+
+    ax_calibration_curve = fig.add_subplot(gs[:2, :2])    
+
+    for k,v in feature_color_dict.items():
+        
+        f = v[0]
+        color = v[1]
+        
+        if f != 'Random baseline':
+            probs = get_prob(X, y, model_type, f)
+            is_goal = probs[:,1]   
+            perc_df = get_percentile(X, y, probs, f)
+
+        # Random baseline
+        else:
+            is_goal = np.random.uniform(0,1,is_goal.shape[0])
+            no_goal_prob = np.array([(1-i) for i in is_goal])
+            probs = np.column_stack((is_goal, no_goal_prob))
+            perc_df = get_percentile(X, y, probs)
+        
+        goal_rate_df = get_rate(perc_df)
+        plt.plot(
+            goal_rate_df['Percentile']/100,
+            goal_rate_df['Rate']/100,
+            label = f'{f}',
+            color = color
+        )   
+       
+    plt.title('Goal rate')
+    plt.legend()
+    plt.grid(True)
+
+
+def plot_cumulative_rate(X, y, feature_color_dict, model_type):
+    
+    fig = plt.figure(figsize=(20, 20))
+    gs = GridSpec(4, 2)
+
+    ax_calibration_curve = fig.add_subplot(gs[:2, :2])
+    
+    for k,v in feature_color_dict.items():
+        
+        f = v[0]
+        color = v[1]
+
+        if f != 'Random baseline':
+            probs = get_prob(X, y, model_type, f)
+            is_goal = probs[:,1]   
+            perc_df = get_percentile(X, y, probs, f)
+
+        # Random baseline
+        else:
+            is_goal = np.random.uniform(0,1,is_goal.shape[0])
+            no_goal_prob = np.array([(1-i) for i in is_goal])
+            probs = np.column_stack((is_goal, no_goal_prob))
+            perc_df = get_percentile(X, y, probs)
+            
+        cumulative_rate = get_rate(perc_df, function_type='cumulative_rate') 
+        
+        plt.plot(
+            cumulative_rate['Percentile']/100,
+            cumulative_rate['Rate']/100,
+            label = f'{f}',
+            color = color,
+        )  
+   
+    plt.title('Cumulative goal rate')
+    plt.legend()
+    plt.grid(True)
+
+
+def plot_calibration(X, y, feature_color_dict, model_type):
+    '''
+    https://scikit-learn.org/stable/auto_examples/calibration/plot_calibration_curve.html
+    '''
+
+    fig = plt.figure(figsize=(20, 20))
+    gs = GridSpec(4, 2)
+
+    ax_calibration_curve = fig.add_subplot(gs[:2, :2])
+
+    # select model
+    if model_type == 'logreg':
+        # Logistic regression model fitting
+        clf = LogisticRegression()
+    
+    elif model_type == 'xgb':
+        # Fit model no training data
+        clf = xgb.XGBClassifier()  
+
+    for k,v in feature_color_dict.items():
+        
+        f = v[0]
+        color = v[1]
+        
+        if f != 'Random baseline':
+            X_train, X_test, y_train, y_test = train_test_split(X[f],
+                                                                y,
+                                                                test_size=0.20,
+                                                                random_state=50)
+            y_train = y_train.values.ravel()
+            clf.fit(X_train, y_train)
+        
+        # Random baseline
+        else:
+            goal_prob = np.random.uniform(0, 1, X_test.shape[0])
+            
+            # Value is 1 if goal_prob is greater than 0.5, 0 otherwise.
+            random_y_test = np.zeros((goal_prob.shape[0],1))
+            random_y_test[:,][np.where(goal_prob>0.5)]=1
+        
+        display = CalibrationDisplay.from_estimator(
+                clf,
+                X_test,
+                y_test,
+                n_bins=50,
+                ax=ax_calibration_curve,
+                color=color,
+                label=f'{f}'
+            )
+    
+    ax_calibration_curve.grid()
+    ax_calibration_curve.set_title("Calibration plots (SVC)")
+
+    plt.show()
+
+
 def plot_models(X, y, model_type, features=['Distance from Net']):
     '''
     :param features: A list. Possible items are 'Distance from Net', 'Angle from Net', and both.    
     :param model_type: 'logreg' or 'xgb'
     '''
-    #--------------------------------------
-    # Training model
-    #--------------------------------------
-    # Create a training and validation split
-    X_train, X_test, y_train, y_test = train_test_split(X[features],y,test_size=0.20,random_state=50)
-    
-    #--------------------------------------
-    # Calculate goal probability
-    #--------------------------------------  
-    probs = get_prob(X, y, model_type, features)
-    is_goal = probs[:,1]
+
+    feature_color_dict = {
+        1: [['Distance from Net'], 'r'],
+        2: [['Angle from Net'], 'g'],
+        3: [['Distance from Net', 'Angle from Net'], 'plum'],
+        4: ['Random baseline', 'b']
+        }
     
     #--------------------------------------
     # ROC
     #--------------------------------------
-    fpr, tpr, threshold = metrics.roc_curve(y_test, is_goal)
-    roc_auc = metrics.auc(fpr, tpr)
-    plt.plot(
-        fpr, 
-        tpr, 
-        'b', 
-        label = 'AUC = %0.2f' % roc_auc)
+    plot_roc(X, y, feature_color_dict, model_type)
+    plt.show()
     
     #--------------------------------------
     # Goal rate
     #--------------------------------------  
-    perc_df = get_percentile(X, y, probs, features) 
-    goal_rate_df = get_rate(perc_df)
-    plt.plot(
-        goal_rate_df['Percentile']/100,
-        goal_rate_df['Rate']/100,
-        label = 'Goal rate'
-    )
+    plot_goal_rate(X, y, feature_color_dict, model_type)
+    plt.show()
     
     #--------------------------------------
     # Cumulative proportion of goals
     #--------------------------------------  
-    cumulative_rate = get_rate(perc_df, function_type='cumulative_rate') 
-    plt.plot(
-        cumulative_rate['Percentile']/100,
-        cumulative_rate['Rate']/100,
-        label = 'Cumulative goal rate'
-    )
+    plot_cumulative_rate(X, y, feature_color_dict, model_type)
+    plt.show()
     
     #--------------------------------------
-    # Random baseline
+    # Calibration
     #-------------------------------------- 
-    plt.plot(
-        [0, 1], 
-        [0, 1], 
-        label='Random baseline')
-    
-    if len(features)==2:
-        title = 'Feature: Distance and Angle'
-    else:
-        title = features[0]
-        
-    plt.title(title)
-    plt.legend()
+    plot_calibration(X, y, feature_color_dict, model_type)
+    plt.show()
+
+
+if __name__ == '__main__':
+    # X,y = read_dataset()
+    # plot_models(X, y, 'xgb')
+    pass
