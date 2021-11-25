@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 import matplotlib.pyplot as plt
 from sklearn.calibration import calibration_curve, CalibrationDisplay
@@ -64,10 +65,7 @@ def train(model_name, model_path, features=['Distance from Net']):
     # experiment.log_dataset_hash(X_train)
     # experiment.log_parameters(params)
     # experiment.log_metrics(metrics_dict)
-
-# train('distance_and_angle', 
-#         'models/distance_and_angle.h5', 
-#         features=['Distance from Net', 'Angle from Net'])    
+  
 
 
 def get_prob(X, y, model_type, features=['Distance from Net']):
@@ -84,14 +82,15 @@ def get_prob(X, y, model_type, features=['Distance from Net']):
         # Logistic regression model fitting
         clf = LogisticRegression()
         y_train = y_train.values.ravel()
-        clf.fit(X_train, y_train)
     
     elif model_type == 'xgb':
         # Fit model no training data
         clf = xgb.XGBClassifier()
-        clf.fit(X_train, y_train)       
     
-    # use clf.classes_ to check the order of labels     
+    elif model_type == 'decision_tree':
+        clf = DecisionTreeClassifier(max_leaf_nodes=3, random_state=0)  
+
+    clf.fit(X_train, y_train)
 
     # Predict the probability
     X_test_pred_proba = clf.predict_proba(X_test)
@@ -170,17 +169,21 @@ def get_rate(df, function_type='goal_rate'):
         rows = df[(df['Percentile']>=lower_bound) &
                   (df['Percentile']<upper_bound)]
         
-        # count the number of goals
-        goals = rows['Is Goal'].value_counts()[1]
+        # if no rows exist
+        if rows.empty:
+            rate = 0
+        else:
+            # count the number of goals
+            goals = rows['Is Goal'].value_counts()[1]
 
-        shots = rows.shape[0]
+            shots = rows.shape[0]
 
-        if function_type == 'goal_rate':
-            rate = goals/shots
-            
-        elif function_type == 'cumulative_rate':
-            cumulative_counts += goals
-            rate = (cumulative_counts)/total_goals
+            if function_type == 'goal_rate':
+                rate = goals/shots
+                
+            elif function_type == 'cumulative_rate':
+                cumulative_counts += goals
+                rate = (cumulative_counts)/total_goals
 
         rate_list.append(rate)
 
@@ -329,6 +332,9 @@ def plot_calibration(X, y, feature_color_dict, model_type):
         # Fit model no training data
         clf = xgb.XGBClassifier()  
 
+    elif model_type == 'decision_tree':
+        clf = DecisionTreeClassifier(max_leaf_nodes=3, random_state=0)
+
     for k,v in feature_color_dict.items():
         
         f = v[0]
@@ -405,6 +411,8 @@ def plot_models(X, y, model_type, features=['Distance from Net']):
 
 
 if __name__ == '__main__':
-    # X,y = read_dataset()
-    # plot_models(X, y, 'xgb')
-    pass
+    X,y = read_dataset()
+    plot_models(X, y, 'decision_tree')
+    # train('distance_and_angle', 
+    #         'models/distance_and_angle.h5', 
+    #         features=['Distance from Net', 'Angle from Net'])      
