@@ -1,6 +1,7 @@
 from comet_ml import Experiment
 import os
 from pathlib import Path
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -28,13 +29,14 @@ def read_dataset():
 
 def train(model_name, model_path, features=['Distance from Net']):
 
-    # experiment = Experiment(
-    #     api_key = os.environ.get("COMET_API_KEY"),
-    #     project_name = 'milestone_2',
-    #     workspace='xiaoxin-zhou')
+
+    experiment = Experiment(
+        api_key = os.environ.get("COMET_API_KEY"),
+        project_name = 'milestone_2',
+        workspace='xiaoxin-zhou')
 
     # Path('models/').mkdir(exist_ok=True)
-    # experiment.log_model(model_name, model_path)
+    
 
     X, y = read_dataset()
 
@@ -49,6 +51,12 @@ def train(model_name, model_path, features=['Distance from Net']):
     y_train = y_train.values.ravel()
     clf.fit(X_train, y_train)
 
+    # save the model to disk
+    filename = 'models\log_reg\log_reg_dist.pkl'
+    pickle.dump(clf, open(filename, 'wb'))
+
+    experiment.log_model('logreg_model', filename)
+
     # Predict on validation set
     y_pred = clf.predict(X_test)
     accuracy = metrics.accuracy_score(y_test, y_pred)
@@ -62,9 +70,11 @@ def train(model_name, model_path, features=['Distance from Net']):
         'accuracy': accuracy
     }
 
-    # experiment.log_dataset_hash(X_train)
-    # experiment.log_parameters(params)
-    # experiment.log_metrics(metrics_dict)
+    experiment.log_dataset_hash(X_train)
+    experiment.log_parameters(params)
+    experiment.log_metrics(metrics_dict)
+
+
   
 
 
@@ -412,7 +422,10 @@ def plot_models(X, y, model_type, features=['Distance from Net']):
 
 if __name__ == '__main__':
     X,y = read_dataset()
-    plot_models(X, y, 'decision_tree')
+    train(X, y)
+
+
+    
     # train('distance_and_angle', 
     #         'models/distance_and_angle.h5', 
     #         features=['Distance from Net', 'Angle from Net'])      
