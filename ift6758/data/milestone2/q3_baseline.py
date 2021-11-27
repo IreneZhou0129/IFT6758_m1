@@ -52,10 +52,10 @@ def train(model_name, model_path, features=['Distance from Net']):
     clf.fit(X_train, y_train)
 
     # save the model to disk
-    filename = 'models\log_reg\log_reg_dist.pkl'
+    filename = 'models\log_reg\log_reg_both.pkl'
     pickle.dump(clf, open(filename, 'wb'))
 
-    experiment.log_model('logreg_model', filename)
+    experiment.log_model('logreg_both', filename)
 
     # Predict on validation set
     y_pred = clf.predict(X_test)
@@ -422,7 +422,7 @@ def plot_models(X, y, model_type, features=['Distance from Net']):
 
 if __name__ == '__main__':
     X,y = read_dataset()
-    train(X, y)
+    train(X, y, features=['Angle from Net','Distance from Net'])
 
 
     
