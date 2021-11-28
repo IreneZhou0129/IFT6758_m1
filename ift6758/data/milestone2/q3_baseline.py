@@ -249,6 +249,8 @@ def plot_roc(X, y, feature_color_dict, model_type):
         
     plt.title('ROC Curves', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
+    plt.rc('xtick', labelsize=16)
+    plt.rc('ytick', labelsize=16)
     plt.ylabel('True Positive Rate', fontsize=20)
     plt.xlabel('False Positive Rate', fontsize=20)    
     plt.grid(True)
@@ -290,6 +292,8 @@ def plot_goal_rate(X, y, feature_color_dict, model_type):
        
     plt.title('Goal rate', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
+    plt.rc('xtick', labelsize=16)
+    plt.rc('ytick', labelsize=16)
     plt.ylabel('Goal Rate', fontsize=20)
     plt.xlabel('Shot Probability Model Percentile', fontsize=20)    
     plt.grid(True)
@@ -333,6 +337,8 @@ def plot_cumulative_rate(X, y, feature_color_dict, model_type):
    
     plt.title('Cumulative goal rate', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
+    plt.rc('xtick', labelsize=16)
+    plt.rc('ytick', labelsize=16)
     plt.ylabel('Cumulative Proportion of Goals', fontsize=20)
     plt.xlabel('Shot Probability Model Percentile', fontsize=20)    
     plt.grid(True)
@@ -395,8 +401,10 @@ def plot_calibration(X, y, feature_color_dict, model_type):
             )
     
     ax_calibration_curve.grid()
-    ax_calibration_curve.set_title("Calibration plots")
+    plt.title("Calibration plots", fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
+    plt.rc('xtick', labelsize=16)
+    plt.rc('ytick', labelsize=16)
     plt.ylabel('Fraction of positives', fontsize=20)
     plt.xlabel('Mean predicted probability', fontsize=20)
     plt.show()
