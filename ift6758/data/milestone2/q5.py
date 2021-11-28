@@ -166,3 +166,9 @@ if __name__ == '__main__':
     # X,y = read_dataset()
     # train(X, y, features=['Distance from Net','Angle from Net'])
     q5_2()
+
+
+
+# What are 'model' and 'pickle'?
+# - https://practicaldatascience.co.uk/machine-learning/how-to-save-and-load-machine-learning-models-using-pickle
+# - https://towardsdatascience.com/why-turn-into-a-pickle-b45163007dac 

@@ -222,15 +222,18 @@ def plot_roc(X, y, feature_color_dict, model_type):
         
         f = v[0]
         color = v[1]
+        curve_label = ''
         
         if f != 'Random baseline':
             X_train, X_test, y_train, y_test = train_test_split(X[f],y,test_size=0.20,random_state=50)
             probs = get_prob(X, y, model_type, f)
-            is_goal = probs[:,1]                
+            is_goal = probs[:,1]  
+            curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
 
         # Random baseline
         else:
             is_goal = np.random.uniform(0,1,is_goal.shape[0])
+            curve_label = f
         
         fpr, tpr, threshold = metrics.roc_curve(y_test, is_goal)
         
@@ -240,12 +243,14 @@ def plot_roc(X, y, feature_color_dict, model_type):
             fpr, 
             tpr, 
             color = color, 
-            label = f'{f} '+'AUC = %0.2f' % roc_auc)      
+            label = f'{curve_label} '+'AUC = %0.2f' % roc_auc)      
     
     plt.axis([0, 1, 0, 1])    
         
-    plt.title('ROC Curves')
-    plt.legend()
+    plt.title('ROC Curves', fontsize=20)
+    plt.legend(loc=2,prop={'size': 16})
+    plt.ylabel('True Positive Rate', fontsize=20)
+    plt.xlabel('False Positive Rate', fontsize=20)    
     plt.grid(True)
 
 
@@ -259,11 +264,13 @@ def plot_goal_rate(X, y, feature_color_dict, model_type):
         
         f = v[0]
         color = v[1]
+        curve_label = ''
         
         if f != 'Random baseline':
             probs = get_prob(X, y, model_type, f)
             is_goal = probs[:,1]   
             perc_df = get_percentile(X, y, probs, f)
+            curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
 
         # Random baseline
         else:
@@ -271,17 +278,20 @@ def plot_goal_rate(X, y, feature_color_dict, model_type):
             no_goal_prob = np.array([(1-i) for i in is_goal])
             probs = np.column_stack((is_goal, no_goal_prob))
             perc_df = get_percentile(X, y, probs)
+            curve_label = f
         
         goal_rate_df = get_rate(perc_df)
         plt.plot(
             goal_rate_df['Percentile']/100,
             goal_rate_df['Rate']/100,
-            label = f'{f}',
+            label = curve_label,
             color = color
         )   
        
-    plt.title('Goal rate')
-    plt.legend()
+    plt.title('Goal rate', fontsize=20)
+    plt.legend(loc=2,prop={'size': 16})
+    plt.ylabel('Goal Rate', fontsize=20)
+    plt.xlabel('Shot Probability Model Percentile', fontsize=20)    
     plt.grid(True)
 
 
@@ -296,11 +306,13 @@ def plot_cumulative_rate(X, y, feature_color_dict, model_type):
         
         f = v[0]
         color = v[1]
+        curve_label = ''
 
         if f != 'Random baseline':
             probs = get_prob(X, y, model_type, f)
             is_goal = probs[:,1]   
             perc_df = get_percentile(X, y, probs, f)
+            curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
 
         # Random baseline
         else:
@@ -308,18 +320,21 @@ def plot_cumulative_rate(X, y, feature_color_dict, model_type):
             no_goal_prob = np.array([(1-i) for i in is_goal])
             probs = np.column_stack((is_goal, no_goal_prob))
             perc_df = get_percentile(X, y, probs)
+            curve_label = f
             
         cumulative_rate = get_rate(perc_df, function_type='cumulative_rate') 
         
         plt.plot(
             cumulative_rate['Percentile']/100,
             cumulative_rate['Rate']/100,
-            label = f'{f}',
+            label = curve_label,
             color = color,
         )  
    
-    plt.title('Cumulative goal rate')
-    plt.legend()
+    plt.title('Cumulative goal rate', fontsize=20)
+    plt.legend(loc=2,prop={'size': 16})
+    plt.ylabel('Cumulative Proportion of Goals', fontsize=20)
+    plt.xlabel('Shot Probability Model Percentile', fontsize=20)    
     plt.grid(True)
 
 
@@ -349,6 +364,7 @@ def plot_calibration(X, y, feature_color_dict, model_type):
         
         f = v[0]
         color = v[1]
+        curve_label = ''
         
         if f != 'Random baseline':
             X_train, X_test, y_train, y_test = train_test_split(X[f],
@@ -357,14 +373,16 @@ def plot_calibration(X, y, feature_color_dict, model_type):
                                                                 random_state=50)
             y_train = y_train.values.ravel()
             clf.fit(X_train, y_train)
+            curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
         
         # Random baseline
         else:
             goal_prob = np.random.uniform(0, 1, X_test.shape[0])
             
             # Value is 1 if goal_prob is greater than 0.5, 0 otherwise.
-            random_y_test = np.zeros((goal_prob.shape[0],1))
-            random_y_test[:,][np.where(goal_prob>0.5)]=1
+            y_test = np.zeros((goal_prob.shape[0],1))
+            y_test[:,][np.where(goal_prob>0.5)]=1
+            curve_label = f
         
         display = CalibrationDisplay.from_estimator(
                 clf,
@@ -373,12 +391,14 @@ def plot_calibration(X, y, feature_color_dict, model_type):
                 n_bins=50,
                 ax=ax_calibration_curve,
                 color=color,
-                label=f'{f}'
+                label=curve_label
             )
     
     ax_calibration_curve.grid()
-    ax_calibration_curve.set_title("Calibration plots (SVC)")
-
+    ax_calibration_curve.set_title("Calibration plots")
+    plt.legend(loc=2,prop={'size': 16})
+    plt.ylabel('Fraction of positives', fontsize=20)
+    plt.xlabel('Mean predicted probability', fontsize=20)
     plt.show()
 
 
