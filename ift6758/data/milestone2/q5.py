@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 
 import sys
 sys.path.append('../ift6758/data/milestone2')
-from q3_baseline import read_dataset
+from q3_baseline import read_dataset, plot_models
 
 #classes for grid search and cross-validation, function for splitting data and evaluating models
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, train_test_split
@@ -79,7 +79,10 @@ def train(X, y, features=['Distance from Net']):
     experiment.log_parameters(params)
     experiment.log_metrics(metrics_dict)    
 
-
+# xsticks and ysticks are unstable on jupyter environment
+def q5_1_plots():
+    X,y = read_dataset()
+    plot_models(X, y, 'xgb')
 
 def q5_2():
     
@@ -165,4 +168,13 @@ def q5_2():
 if __name__ == '__main__':
     # X,y = read_dataset()
     # train(X, y, features=['Distance from Net','Angle from Net'])
-    q5_2()
+    
+    # q5_1_plots()
+
+    # q5_2()
+
+
+
+# What are 'model' and 'pickle'?
+# - https://practicaldatascience.co.uk/machine-learning/how-to-save-and-load-machine-learning-models-using-pickle
+# - https://towardsdatascience.com/why-turn-into-a-pickle-b45163007dac 
