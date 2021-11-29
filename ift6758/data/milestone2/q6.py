@@ -53,7 +53,7 @@ def tree_train(X, y):
     clf.fit(X_train, y_train)
 
     # save the model to disk
-    filename = 'models\decision_tree\test_3.pkl'
+    filename = 'models/decision_tree/test_3.pkl'
     pickle.dump(clf, open(filename, 'wb'))  
 
     experiment.log_model('decision_tree', filename)  
