@@ -52,7 +52,7 @@ def train(X, y, features=['Distance from Net']):
     clf.fit(X_train, y_train)
 
     # save the model to disk
-    filename = r'models\xgboost\q5_1.pkl'
+    filename = r'models/xgboost/q5_1.pkl'
     pickle.dump(clf, open(filename, 'wb'))
 
     # experiment.log_model('xgboost_5_1', filename)
@@ -149,7 +149,7 @@ def q5_2():
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
     
     # save the model to disk
-    filename = r'models\xgboost\q5_2.pkl'
+    filename = r'models/xgboost/q5_2.pkl'
     
     pickle.dump(clf, open(filename, 'wb'))
     

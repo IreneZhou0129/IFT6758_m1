@@ -52,7 +52,7 @@ def train(model_name, model_path, features=['Distance from Net']):
     clf.fit(X_train, y_train)
 
     # save the model to disk
-    filename = 'models\log_reg\log_reg_both.pkl'
+    filename = 'models/log_reg/log_reg_both.pkl'
     pickle.dump(clf, open(filename, 'wb'))
 
     experiment.log_model('logreg_both', filename)
