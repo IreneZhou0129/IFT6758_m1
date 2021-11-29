@@ -176,6 +176,11 @@ def q5_2():
     
 
 def q5_3_var_threshold():
+    experiment = Experiment(
+        api_key = os.environ.get("COMET_API_KEY"),
+        project_name = 'milestone_2',
+        workspace='xiaoxin-zhou')   
+    
     dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
 
     # Separate features and labels 
@@ -191,10 +196,17 @@ def q5_3_var_threshold():
     sel_reduced = sel.fit_transform(X)
     print(sel_reduced.shape)
     
-    return sel_reduced.shape, sel_reduced
+    exp.log_dataset_hash(sel_reduced)
+    
+    # return sel_reduced.shape, sel_reduced
 
 
 def q5_3_selectKbest():
+    experiment = Experiment(
+        api_key = os.environ.get("COMET_API_KEY"),
+        project_name = 'milestone_2',
+        workspace='xiaoxin-zhou')    
+        
     # Read CSV files
     dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
 
@@ -217,10 +229,17 @@ def q5_3_selectKbest():
 
     X_new = SelectKBest(chi2, k=6).fit_transform(X, y)
     
-    return X_new.shape, X_new
+    experiment.log_dataset_hash(X_new)
+        
+    # return X_new.shape, X_new
 
 
-def q5_3_SelectFromModel():
+def q5_3_selectFromModel():
+    experiment = Experiment(
+        api_key = os.environ.get("COMET_API_KEY"),
+        project_name = 'milestone_2',
+        workspace='xiaoxin-zhou') 
+    
     # Read CSV files
     dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
 
@@ -235,11 +254,18 @@ def q5_3_SelectFromModel():
     model = SelectFromModel(lsvc, prefit=True)
     X_new = model.transform(X)
     X_new.shape
+    
+    experiment.log_dataset_hash(X_new)
 
-    return X_new
+    # return X_new
 
 
-def q5_3_ExtraTree():
+def q5_3_extraTree():
+    experiment = Experiment(
+        api_key = os.environ.get("COMET_API_KEY"),
+        project_name = 'milestone_2',
+        workspace='xiaoxin-zhou') 
+    
     # Read CSV files
     dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
 
@@ -260,7 +286,11 @@ def q5_3_ExtraTree():
     model = SelectFromModel(clf, prefit=True)
     X_new = model.transform(X)
     print(X_new.shape)
-    return X_new.shape, X_new
+    
+    experiment.log_dataset_hash(X_new)
+    
+    # return X_new.shape, X_new
+
 
 if __name__ == '__main__':
     # X,y = read_dataset()
