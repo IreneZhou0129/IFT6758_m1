@@ -29,6 +29,17 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, confusion_m
 
 import time
 
+from sklearn.feature_selection import VarianceThreshold
+
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
+
+from sklearn.svm import LinearSVC
+from sklearn.feature_selection import SelectFromModel
+
+from sklearn.ensemble import ExtraTreesClassifier
+
+
 # need to install graohviz
 # > conda install graphviz python-graphviz
 
@@ -164,6 +175,92 @@ def q5_2():
     # return X_test_pred_proba, y_test, clf, X_test
     
 
+def q5_3_var_threshold():
+    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
+
+    # Separate features and labels 
+    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
+               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
+               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
+               'Change in Shot Angle', 'Speed']]
+    y = dataset[['Is Goal']]
+
+    print(X.shape)
+
+    sel = VarianceThreshold(threshold=(.8 * (1 - .8)))
+    sel_reduced = sel.fit_transform(X)
+    print(sel_reduced.shape)
+    
+    return sel_reduced.shape, sel_reduced
+
+
+def q5_3_selectKbest():
+    # Read CSV files
+    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
+
+    # Separate features and labels 
+    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
+               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
+               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
+               'Change in Shot Angle', 'Speed']]
+    y = dataset[['Is Goal']]
+
+    # print(X)
+    min_max_scaler = preprocessing.MinMaxScaler()
+    for col in X:
+        if X[col].dtypes != np.object:
+            # https://www.kite.com/python/answers/how-to-scale-pandas-dataframe-columns-with-the-scikit-learn-minmaxscaler-in-python
+            X[[col]] = min_max_scaler.fit_transform(X[[col]])
+
+    # print(X)
+    # print(X_normalized)
+
+    X_new = SelectKBest(chi2, k=6).fit_transform(X, y)
+    
+    return X_new.shape, X_new
+
+
+def q5_3_SelectFromModel():
+    # Read CSV files
+    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
+
+    # Separate features and labels 
+    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
+               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
+               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
+               'Change in Shot Angle', 'Speed']]
+    y = dataset[['Is Goal']]
+
+    lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(X, y)
+    model = SelectFromModel(lsvc, prefit=True)
+    X_new = model.transform(X)
+    X_new.shape
+
+    return X_new
+
+
+def q5_3_ExtraTree():
+    # Read CSV files
+    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
+
+    # Separate features and labels 
+    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
+               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
+               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
+               'Change in Shot Angle', 'Speed']]
+    y = dataset[['Is Goal']]
+
+    # X, y = load_iris(return_X_y=True)
+    X.shape
+
+    clf = ExtraTreesClassifier(n_estimators=50)
+    clf = clf.fit(X, y)
+    print(clf.feature_importances_)
+
+    model = SelectFromModel(clf, prefit=True)
+    X_new = model.transform(X)
+    print(X_new.shape)
+    return X_new.shape, X_new
 
 if __name__ == '__main__':
     # X,y = read_dataset()
