@@ -14,17 +14,10 @@ from sklearn import metrics
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 
-# ift6758/data/milestone2/q3_baseline
+# ift6758/data/milestone2/q6_baseline
 import sys
 sys.path.append('../ift6758/data/milestone2')
-from q3_baseline import plot_models
-    
-def read_all_features():
-    dataset = pd.read_csv('/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv')
-    X = dataset.iloc[: , :-1]
-    y = dataset[['Is Goal']]    
-
-    return X, y
+from q6_baseline import read_all_features,plot_models
 
 ##############################################################################
 # Approch 1: Decision Tree Classifier
