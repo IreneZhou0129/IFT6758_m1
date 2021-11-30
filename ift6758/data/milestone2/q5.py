@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 
 import sys
 sys.path.append('../ift6758/data/milestone2')
-from q3_baseline import read_dataset, plot_models
+from q6_baseline import read_all_features, plot_models
 
 #classes for grid search and cross-validation, function for splitting data and evaluating models
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, train_test_split
@@ -176,16 +176,6 @@ def q5_2():
     
 
 def q5_3(X, y):
-    
-#     # Read CSV files
-#     dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
-
-#     # Separate features and labels 
-#     X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
-#                'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
-#                'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
-#                'Change in Shot Angle', 'Speed']]
-#     y = dataset[['Is Goal']]
 
     # Create a training and validation split
     X_train, X_test, y_train, y_test = train_test_split(X,
@@ -208,20 +198,11 @@ def q5_3(X, y):
     return model
     
 
-def q5_3_var_threshold():
+def q5_3_var_threshold(X, y):
     experiment = Experiment(
         api_key = os.environ.get("COMET_API_KEY"),
         project_name = 'milestone_2',
         workspace='xiaoxin-zhou')   
-    
-    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
-
-    # Separate features and labels 
-    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
-               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
-               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
-               'Change in Shot Angle', 'Speed']]
-    y = dataset[['Is Goal']]
 
     print(X.shape)
 
@@ -245,21 +226,11 @@ def q5_3_var_threshold():
     # return sel_reduced.shape, sel_reduced
 
 
-def q5_3_selectKbest():
+def q5_3_selectKbest(X, y):
     experiment = Experiment(
         api_key = os.environ.get("COMET_API_KEY"),
         project_name = 'milestone_2',
         workspace='xiaoxin-zhou')    
-        
-    # Read CSV files
-    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
-
-    # Separate features and labels 
-    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
-               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
-               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
-               'Change in Shot Angle', 'Speed']]
-    y = dataset[['Is Goal']]
 
     # print(X)
     min_max_scaler = preprocessing.MinMaxScaler()
@@ -296,16 +267,6 @@ def q5_3_selectFromModel():
         api_key = os.environ.get("COMET_API_KEY"),
         project_name = 'milestone_2',
         workspace='xiaoxin-zhou') 
-    
-    # Read CSV files
-    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
-
-    # Separate features and labels 
-    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
-               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
-               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
-               'Change in Shot Angle', 'Speed']]
-    y = dataset[['Is Goal']]
 
     lsvc = LinearSVC(C=0.01, penalty="l1", dual=False).fit(X, y)
     model = SelectFromModel(lsvc, prefit=True)
@@ -333,17 +294,7 @@ def q5_3_extraTree():
         workspace='xiaoxin-zhou') 
     
     # Read CSV files
-    dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
-
-    # Separate features and labels 
-    X = dataset[['eventIdx', 'game_id', 'Game Seconds', 'Game Period', 'X-Coordinate', 'Y-Coordinate',
-               'Shot Distance', 'Shot Angle', 'Shot Type', 'Was Net Empty', 'Last Event Type', 'Last X-Coordinate',
-               'Last Y-Coordinate', 'Time from Last Event (seconds)', 'Distance from Last Event', 'Is Rebound',
-               'Change in Shot Angle', 'Speed']]
-    y = dataset[['Is Goal']]
-
-    # X, y = load_iris(return_X_y=True)
-    X.shape
+    # dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
 
     clf = ExtraTreesClassifier(n_estimators=50)
     clf = clf.fit(X, y)

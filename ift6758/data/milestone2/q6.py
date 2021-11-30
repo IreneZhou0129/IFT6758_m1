@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 # ift6758/data/milestone2/q6_baseline
 import sys
 sys.path.append('../ift6758/data/milestone2')
-from q6_baseline import read_all_features,plot_models
+from q6_baseline import read_all_features, plot_models
 
 ##############################################################################
 # Approch 1: Decision Tree Classifier
