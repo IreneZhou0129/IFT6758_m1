@@ -69,8 +69,6 @@ def train(X, y, features=['Distance from Net']):
     # save the model to disk
     filename = r'models/xgboost/q5_1.pkl'
     pickle.dump(clf, open(filename, 'wb'))
-
-    # experiment.log_model('xgboost_5_1', filename)
     
 
     # Make predictions for test data
@@ -102,13 +100,7 @@ def q5_1_plots():
 # ##################################################
 # Train XGBoost using all features
 # ##################################################
-def q5_2(X, y):
-
-    # initialize comet.ml experiment
-    experiment = Experiment(
-        api_key = os.environ.get("COMET_API_KEY"),
-        project_name = 'milestone_2',
-        workspace='xiaoxin-zhou') 
+def q5_2(X, y, experiment):
 
     # Create a training and validation split
     X_train, X_test, y_train, y_test = train_test_split(X,
@@ -150,26 +142,89 @@ def q5_2(X, y):
     print("Lowest RMSE: ", (-clf.best_score_)**(1/2.0))
     
     y_pred = clf.predict(X_test)
-    # print('y_pred', y_pred)
     
     # Evaluate predictions
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+    metrics_dict = {
+        'accuracy': accuracy
+    }
+    
+    experiment.log_parameters(clf.best_params_)
+    experiment.log_metrics(metrics_dict)
     
     # save the model to disk
-    filename = r'models/xgboost/q5_2.pkl'
+    # filename = r'models/xgboost/q5_2.pkl'
     
-    pickle.dump(clf, open(filename, 'wb'))
+    # pickle.dump(clf, open(filename, 'wb'))
     
     # log model to comet.ml 
-    experiment.log_model('xgboost_5_2', filename)
+    # experiment.log_model('xgboost_5_2', filename)
 
-    # experiment.log_model('xgboost_5_1', filename)
-    # Predict the probability of each test sample being of a given class
-    # X_test_pred_proba = clf.predict_proba(X_test)
-    # print(X_test_pred_proba)
+    # return None
+
+
+# In above q5_2(), we forgot to log accuracy to model. Based on the output, we got:
+# Best parameters: {
+#     'booster': 'gbtree', 
+#     'learning_rate': 0.05, 
+#     'max_depth': 10, 
+#     'n_estimators': 100}
+# So, in q5_2_tuned(), we apply these parameters to a quick run and log accuracy to the experiment.
+def q5_2_tuned(X, y, experiment):
+    # Create a training and validation split
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        y,
+                                                        test_size=0.20,
+                                                        random_state=50)
     
-    # return X_test_pred_proba, y_test, clf, X_test
+    model = xgb.XGBClassifier(
+        n_estimators=100,
+        max_depth=10,
+        learning_rate=0.5,
+        booster='gbtree'
+    )
+
+    params = {
+        'n_estimators': [100],
+        'max_depth': [10], 
+        'learning_rate':  [0.05],
+        'booster': ['gbtree'],
+    }
+    
+    model.fit(X_train, y_train)
+
+    clf = GridSearchCV(estimator=model,
+                       param_grid=params,
+                       scoring='neg_mean_squared_error',
+                       refit=True,
+                       verbose=4)
+    
+    clf.fit(X_train, y_train)
+
+    # Make predictions for test data
+    y_test_pred = clf.predict(X_test)
+    y_test = y_test.to_numpy().flatten()
+    
+    # Evaluate predictions
+    accuracy = metrics.accuracy_score(y_test, y_test_pred)
+    print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+    metrics_dict = {
+        'accuracy': accuracy
+    }
+    
+    experiment.log_parameters(params)
+    experiment.log_metrics(metrics_dict)
+
+    # # save the model to disk
+    model.save_model("models/q5_2_tuned.model")
+    model_name = "XGBoost Model (q5_2_tuned)"
+    experiment.log_model(model_name, "models/q5_2_tuned.model")
+    experiment.end()    
+
+    return None
     
 
 # ###################################################
@@ -225,13 +280,10 @@ def q5_3_var_threshold(X, y, experiment):
     experiment.log_dataset_hash(sel_reduced)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    # os.makedirs("output", exist_ok=True)
     model.save_model("models/q5_3_var_threshold.model")
     model_name = "XGBoost Model (var threshold)"
     experiment.log_model(model_name, "models/q5_3_var_threshold.model")
     experiment.end()
-    
-    # return sel_reduced.shape, sel_reduced
 
 
 # https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection
@@ -250,13 +302,10 @@ def q5_3_selectKbest(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    # os.makedirs("output", exist_ok=True)
     model.save_model("models/q5_3_selectKBest.model")
     model_name = "XGBoost Model (q5_3_selectKbest)"
     experiment.log_model(model_name, "models/q5_3_selectKBest.model")
     experiment.end()
-        
-    # return X_new.shape, X_new
 
 
 # https://scikit-learn.org/stable/modules/feature_selection.html#feature-selection-using-selectfrommodel
@@ -277,14 +326,11 @@ def q5_3_selectFromModel(X, y, experiment):
     experiment.log_model(model_name, "models/q5_3_selectFromModel.model")
     experiment.end()
 
-    # return X_new
-
 
 def q5_3_extraTree(X, y, experiment): 
 
     clf = ExtraTreesClassifier(n_estimators=50)
     clf = clf.fit(X, y)
-    # print(clf.feature_importances_)
 
     model = SelectFromModel(clf, prefit=True)
     X_new = model.transform(X)
@@ -294,12 +340,10 @@ def q5_3_extraTree(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    # os.makedirs("output", exist_ok=True)
     model.save_model("models/q5_3_extraTree.model")
     model_name = "XGBoost Model (extraTree)"
     experiment.log_model(model_name, "models/q5_3_extraTree.model")
     experiment.end()
-    # return X_new.shape, X_new
 
 
 if __name__ == '__main__':
@@ -311,16 +355,26 @@ if __name__ == '__main__':
         project_name = 'milestone_2',
         workspace='xiaoxin-zhou') 
 
-    # q5_3_var_threshold(X, y, experiment)    
-    # q5_3_selectKbest(X, y, experiment)
-    # q5_3_selectFromModel(X, y, experiment)
-    q5_3_extraTree(X, y, experiment)
-
+    # =================
+    # Question 1
+    # =================
     # train(X, y)
     
     # q5_1_plots()
 
-    # q5_2()
+    # =================
+    # Question 2
+    # =================
+    # q5_2(X, y, experiment)
+    q5_2_tuned(X, y, experiment)
+
+    # =================
+    # Question 3
+    # =================
+    # q5_3_var_threshold(X, y, experiment)    
+    # q5_3_selectKbest(X, y, experiment)
+    # q5_3_selectFromModel(X, y, experiment)
+    # q5_3_extraTree(X, y, experiment)
 
 
 
