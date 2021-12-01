@@ -218,13 +218,11 @@ def q5_2_tuned(X, y, experiment):
     experiment.log_parameters(params)
     experiment.log_metrics(metrics_dict)
 
-    # save the model to disk
-    filename = 'models/xgboost/q5_2_tuned.pkl'
-    
-    pickle.dump(clf, open(filename, 'wb'))
-    
-    # log model to comet.ml 
-    experiment.log_model('xgboost_5_2_tuned', filename)
+    # # save the model to disk
+    model.save_model("models/q5_2_tuned.model")
+    model_name = "XGBoost Model (q5_2_tuned)"
+    experiment.log_model(model_name, "models/q5_2_tuned.model")
+    experiment.end()    
 
     return None
     
