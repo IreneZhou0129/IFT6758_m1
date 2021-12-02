@@ -133,3 +133,5 @@ dmypy.json
 .env
 venv
 
+.vscode/
+ift6758/data/milestone2/ir-test.py
