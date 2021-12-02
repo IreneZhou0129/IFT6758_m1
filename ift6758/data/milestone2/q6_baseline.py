@@ -14,8 +14,8 @@ from sklearn.calibration import calibration_curve, CalibrationDisplay
 import xgboost as xgb
 from matplotlib.gridspec import GridSpec
 
-def read_all_features():
-    dataset = pd.read_csv('/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv')
+def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv'):
+    dataset = pd.read_csv(path)
     
     # @Jason: 
     # dataset = pd.read_csv('/Users/sunjiaao/Courses/IFT6758/m2_CSV_data/all_data_q4_categorical.csv')
