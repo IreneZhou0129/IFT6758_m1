@@ -5,13 +5,16 @@ import pickle
 
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 import matplotlib.pyplot as plt
 from sklearn.calibration import calibration_curve, CalibrationDisplay
-import xgboost as xgb
+from scipy.stats import randint
+from sklearn.decomposition import PCA
+from sklearn.model_selection import RandomizedSearchCV
 from matplotlib.gridspec import GridSpec
 
 def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv'):
@@ -25,6 +28,57 @@ def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all
 
     return X, y
 
+def get_clf(X_train, X_test, model_type):
+    if model_type == 'decision_tree':
+        clf = DecisionTreeClassifier(
+                max_leaf_nodes=3, 
+                max_depth=30)  
+
+    elif model_type == 'xgb':
+        clf = xgb.XGBClassifier()
+
+    elif model_type == 'approach_1':
+        clf = DecisionTreeClassifier()
+
+    elif model_type == 'approach_2':
+        dtc = DecisionTreeClassifier()
+
+        space = dict()
+        space["splitter"] = ["best", "random"]
+        space["max_depth"] = list(range(2, 50))
+        space["min_samples_split"] = np.linspace(0.1, 1.0, 10, endpoint=True)
+        space["min_samples_leaf"] = np.linspace(0.1, 0.5, 5, endpoint=True)
+        space["max_features"] = list(range(1, X_train.shape[1]))
+        space["max_leaf_nodes"] = list(range(2, 10))
+
+        clf = RandomizedSearchCV(dtc, space, random_state=50, verbose=3)
+
+    elif model_type == 'approach_3':
+        pca = PCA(n_components=3)
+        X_train_transformed = pca.fit_transform(X_train)
+        X_test_transformed = pca.fit_transform(X_test)
+
+        clf = DecisionTreeClassifier()        
+
+    elif model_type == 'approach_4':
+        pca = PCA(n_components=3)
+        X_train_transformed = pca.fit_transform(X_train)
+        X_test_transformed = pca.fit_transform(X_test)
+
+        dtc = DecisionTreeClassifier()
+
+        space = dict()
+        space['splitter'] = ['best', 'random']
+        space['max_depth'] = list(range(2, 50))
+        space['min_samples_split'] = np.linspace(0.1, 1.0, 10, endpoint=True)
+        space['min_samples_leaf'] = np.linspace(0.1, 0.5, 5, endpoint=True)
+        space['max_features'] = list(range(1, X_train.shape[1]))
+        space['max_leaf_nodes'] = list(range(2, 10))
+
+        clf = RandomizedSearchCV(dtc, space, random_state=50, verbose=3)   
+
+    return clf    
+
 def get_prob(X, y, model_type):
     '''
      Calculate the probability.
@@ -35,10 +89,7 @@ def get_prob(X, y, model_type):
     # Create a training and validation split
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.20,random_state=50)
     
-    if model_type == 'decision_tree':
-        clf = DecisionTreeClassifier(
-                max_leaf_nodes=3, 
-                max_depth=30)  
+    clf = get_clf(X_train, X_test, model_type)
 
     clf.fit(X_train, y_train)
 
@@ -251,16 +302,12 @@ def plot_calibration(X, y, model_type):
 
     ax_calibration_curve = fig.add_subplot(gs[:2, :2]) 
 
-    if model_type == 'decision_tree':
-        clf = DecisionTreeClassifier(    
-                    max_leaf_nodes=3, 
-                    max_depth=30) 
-
-        
     X_train, X_test, y_train, y_test = train_test_split(X,
                                                         y,
                                                         test_size=0.20,
                                                         random_state=50)
+    clf = get_clf(X_train, X_test,model_type)   
+
     y_train = y_train.values.ravel()
     clf.fit(X_train, y_train)          
         

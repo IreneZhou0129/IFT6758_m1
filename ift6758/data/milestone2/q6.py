@@ -54,7 +54,7 @@ def log_experiment(func):
 
 
 ##############################################################################
-# Approch 1: Decision Tree Classifier
+# Approach 1: Decision Tree Classifier
 ##############################################################################
 @log_experiment
 def approach_1(X_train, X_test, y_train, y_test, model_type, file_name):
@@ -214,6 +214,11 @@ def approach_4(X_train, X_test, y_train, y_test, model_type, file_name):
     return clf, params, metrics_dict
 
 
+def plot_q6_2():
+    X, y = read_all_features()
+    plot_models(X, y, 'approach_4')
+
+
 def main():
     X, y = read_all_features()
 
@@ -248,4 +253,5 @@ def main():
 
 if __name__ == '__main__':
 
-    main()
+    # main()
+    plot_q6_2()
