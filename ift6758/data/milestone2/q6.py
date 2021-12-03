@@ -131,7 +131,7 @@ def approach_2(X_train, X_test, y_train, y_test, model_type, file_name):
 
 
 ####################################################################################
-# Approach 3: Decision Tree Classifier with PCA Feature Selection
+# Approach 3: Decision Tree Classifier with PCA Feature Reduction
 ####################################################################################
 @log_experiment
 def approach_3(X_train, X_test, y_train, y_test, model_type, file_name):

@@ -410,7 +410,7 @@ def plot_calibration(X, y, feature_color_dict, model_type):
     plt.show()
 
 
-def plot_models(X, y, model_type, features=['Distance from Net']):
+def plot_models(X, y, model_type):
     '''
     :param features: A list. Possible items are 'Distance from Net', 'Angle from Net', and both.    
     :param model_type: 'logreg' or 'xgb'
