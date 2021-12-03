@@ -40,6 +40,9 @@ def get_prob(X, y, model_type):
                 max_leaf_nodes=3, 
                 max_depth=30)  
 
+    elif model_type == 'xgb':
+        clf = xgb.XGBClassifier()
+
     clf.fit(X_train, y_train)
 
     # Predict the probability
@@ -255,6 +258,8 @@ def plot_calibration(X, y, model_type):
         clf = DecisionTreeClassifier(    
                     max_leaf_nodes=3, 
                     max_depth=30) 
+    elif model_type == 'xgb':
+        clf = xgb.XGBClassifier()    
 
         
     X_train, X_test, y_train, y_test = train_test_split(X,
