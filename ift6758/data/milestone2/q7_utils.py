@@ -20,22 +20,11 @@ def plot_roc(X, y, five_curves):
 
     q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
     q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
-    model_full_path = '/Users/xiaoxinzhou/Documents/2021-Fall/UdeM/IFT6758/IFT6758_m1/models'
 
     for k,v in five_curves.items():
         print(f'*************************\nrunning {k}\n*************************')
 
         X, y = read_all_features(v['data_path'])
-
-        # only for #4
-        # if k=='4':
-        #     model = q5_3_selectKbest(X, y)
-
-        # else:
-        #     # get model from pickles (1, 2, 3, and 5)
-        #     pickle_name = v['pickle_name']
-        #     model_path = f'{model_full_path}/{pickle_name}'
-        #     model = pickle.load(open(model_path, 'rb'))
 
         model_type = v['model_type']
 
@@ -71,7 +60,7 @@ def plot_roc(X, y, five_curves):
     plt.grid(True)
     plt.show()
 
-def plot_goal_rate(X, y, model_type):
+def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
     fig = plt.figure(figsize=(20, 20))
     gs = GridSpec(4, 2)
 
@@ -151,7 +140,12 @@ if __name__=='__main__':
         }
     }
 
-    plot_roc(X, y, five_curves)
+    # plot_roc(X, y, five_curves)
+
+    q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
+    q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
+
+    plot_goal_rate(X, y, five_curves, q2_path, q4_path)
 
 
 
