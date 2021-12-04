@@ -16,6 +16,8 @@ from scipy.stats import randint
 from sklearn.decomposition import PCA
 from sklearn.model_selection import RandomizedSearchCV
 from matplotlib.gridspec import GridSpec
+from sklearn import preprocessing
+from sklearn.feature_selection import SelectKBest,chi2
 
 def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv'):
     dataset = pd.read_csv(path)
@@ -28,7 +30,7 @@ def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all
 
     return X, y
 
-def get_clf(X_train, X_test, model_type):
+def get_clf(X_train, X_test, model_type,y_train=None):
     if model_type == 'decision_tree':
         clf = DecisionTreeClassifier(
                 max_leaf_nodes=3, 
@@ -61,25 +63,49 @@ def get_clf(X_train, X_test, model_type):
         clf = DecisionTreeClassifier()        
 
     elif model_type == 'approach_4':
-        pca = PCA(n_components=3)
-        X_train_transformed = pca.fit_transform(X_train)
-        X_test_transformed = pca.fit_transform(X_test)
+        # pca = PCA(n_components=3)
+        # X_train_transformed = pca.fit_transform(X_train)
+        # X_test_transformed = pca.fit_transform(X_test)
 
-        dtc = DecisionTreeClassifier()
+        # dtc = DecisionTreeClassifier()
 
-        space = dict()
-        space['splitter'] = ['best', 'random']
-        space['max_depth'] = list(range(2, 50))
-        space['min_samples_split'] = np.linspace(0.1, 1.0, 10, endpoint=True)
-        space['min_samples_leaf'] = np.linspace(0.1, 0.5, 5, endpoint=True)
-        space['max_features'] = list(range(1, X_train.shape[1]))
-        space['max_leaf_nodes'] = list(range(2, 10))
+        # space = dict()
+        # space['splitter'] = ['best', 'random']
+        # space['max_depth'] = list(range(2, 50))
+        # space['min_samples_split'] = np.linspace(0.1, 1.0, 10, endpoint=True)
+        # space['min_samples_leaf'] = np.linspace(0.1, 0.5, 5, endpoint=True)
+        # space['max_features'] = list(range(1, X_train.shape[1]))
+        # space['max_leaf_nodes'] = list(range(2, 10))
 
-        clf = RandomizedSearchCV(dtc, space, random_state=50, verbose=3)   
+        # clf = RandomizedSearchCV(dtc, space, random_state=50, verbose=3)   
+        clf = MLPClassifier(hidden_layer_sizes=(15,), 
+                        # activation='relu',
+                        solver='adam', 
+                        alpha=1e-5,
+                        max_iter=300,
+                        random_state=1
+                       )
     
     elif model_type == 'logreg':
         # Logistic regression model fitting
         clf = LogisticRegression()
+
+    elif model_type == 'xgb_tech_2':
+        min_max_scaler = preprocessing.MinMaxScaler()
+        for col in X_train:
+            if X_train[col].dtypes != np.object:
+                # https://www.kite.com/python/answers/how-to-scale-pandas-dataframe-columns-with-the-scikit-learn-minmaxscaler-in-python
+                X_train[[col]] = min_max_scaler.fit_transform(X_train[[col]])
+
+        X_new = SelectKBest(chi2, k=6).fit_transform(X_train, y_train)
+        
+        X_train, X_test, y_train, y_test = train_test_split(X_new,
+                                                        y_train,
+                                                        test_size=0.20,
+                                                        random_state=50)
+        clf = xgb.XGBClassifier()
+        clf.fit(X_train, y_train)
+    
     
     return clf    
 
@@ -93,7 +119,7 @@ def get_prob(X, y, model_type):
     # Create a training and validation split
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.20,random_state=50)
     
-    clf = get_clf(X_train, X_test, model_type)
+    clf = get_clf(X_train, X_test, model_type, y_train)
 
     clf.fit(X_train, y_train)
 
