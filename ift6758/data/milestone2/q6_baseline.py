@@ -76,7 +76,11 @@ def get_clf(X_train, X_test, model_type):
         space['max_leaf_nodes'] = list(range(2, 10))
 
         clf = RandomizedSearchCV(dtc, space, random_state=50, verbose=3)   
-
+    
+    elif model_type == 'logreg':
+        # Logistic regression model fitting
+        clf = LogisticRegression()
+    
     return clf    
 
 def get_prob(X, y, model_type):

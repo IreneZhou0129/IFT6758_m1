@@ -287,9 +287,14 @@ def q5_3_selectKbest(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    model.save_model("models/q5_3_selectKBest.model")
+    # model.save_model("models/q5_3_selectKBest.model")
+    # model_name = "XGBoost Model (q5_3_selectKbest)"
+    # experiment.log_model(model_name, "models/q5_3_selectKBest.model")
+
+    model.save_model("models/q5_3_selectKBest.pkl")
     model_name = "XGBoost Model (q5_3_selectKbest)"
-    experiment.log_model(model_name, "models/q5_3_selectKBest.model")
+    experiment.log_model(model_name, "models/q5_3_selectKBest.pkl")
+
     experiment.end()
 
 
@@ -385,7 +390,7 @@ def main():
     # Question 3
     # =================
     # q5_3_var_threshold(X, y, experiment)    
-    # q5_3_selectKbest(X, y, experiment)
+    q5_3_selectKbest(X, y, experiment)
     # q5_3_selectFromModel(X, y, experiment)
     # q5_3_extraTree(X, y, experiment)
     # q5_3_rfe_logreg(X, y, experiment)
