@@ -18,6 +18,7 @@ from sklearn.model_selection import RandomizedSearchCV
 from matplotlib.gridspec import GridSpec
 from sklearn import preprocessing
 from sklearn.feature_selection import SelectKBest,chi2
+from sklearn.neural_network import MLPClassifier
 
 def read_all_features(path='/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/all_data_categorical.csv'):
     dataset = pd.read_csv(path)

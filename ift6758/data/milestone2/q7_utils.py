@@ -15,15 +15,12 @@ from q6_baseline import get_prob, \
                         get_clf, \
                         read_all_features
 
-def plot_roc(X, y, five_curves):
+def plot_roc(X, y, five_curves,  q2_path, q4_path,season_type):
 
     fig = plt.figure(figsize=(20, 20))
     gs = GridSpec(4, 2)
 
     ax_calibration_curve = fig.add_subplot(gs[:2, :2])    
-
-    q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
-    q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
 
     for k,v in five_curves.items():
         print(f'*************************\nrunning {k}\n*************************')
@@ -55,7 +52,7 @@ def plot_roc(X, y, five_curves):
     
     plt.axis([0, 1, 0, 1])    
         
-    plt.title('ROC Curves', fontsize=20)
+    plt.title(f'ROC Curves ({season_type})', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
     plt.rc('xtick', labelsize=16)
     plt.rc('ytick', labelsize=16)
@@ -64,7 +61,7 @@ def plot_roc(X, y, five_curves):
     plt.grid(True)
     plt.show()
 
-def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
+def plot_goal_rate(X, y, five_curves, q2_path, q4_path,season_type):
     fig = plt.figure(figsize=(20, 20))
     gs = GridSpec(4, 2)
 
@@ -97,7 +94,7 @@ def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
             color = color
         )   
         
-    plt.title('Goal rate', fontsize=20)
+    plt.title(f'Goal rate ({season_type})', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
     plt.rc('xtick', labelsize=16)
     plt.rc('ytick', labelsize=16)
@@ -106,7 +103,7 @@ def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
     plt.grid(True)
     plt.show()
 
-def plot_cumulative_rate(X, y, five_curves, q2_path, q4_path):
+def plot_cumulative_rate(X, y, five_curves, q2_path, q4_path,season_type):
     
     fig = plt.figure(figsize=(20, 20))
     gs = GridSpec(4, 2)
@@ -141,7 +138,7 @@ def plot_cumulative_rate(X, y, five_curves, q2_path, q4_path):
             color = color,
         )  
    
-    plt.title('Cumulative goal rate', fontsize=20)
+    plt.title(f'Cumulative goal rate ({season_type})', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
     plt.rc('xtick', labelsize=16)
     plt.rc('ytick', labelsize=16)
@@ -150,7 +147,7 @@ def plot_cumulative_rate(X, y, five_curves, q2_path, q4_path):
     plt.grid(True)
     plt.show()
 
-def plot_calibration(X, y, five_curves, q2_path, q4_path):
+def plot_calibration(X, y, five_curves, q2_path, q4_path,season_type):
     '''
     https://scikit-learn.org/stable/auto_examples/calibration/plot_calibration_curve.html
     '''
@@ -194,7 +191,7 @@ def plot_calibration(X, y, five_curves, q2_path, q4_path):
             )
     
     ax_calibration_curve.grid()
-    plt.title("Calibration plots", fontsize=20)
+    plt.title(f"Calibration plots ({season_type})", fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
     plt.rc('xtick', labelsize=16)
     plt.rc('ytick', labelsize=16)
@@ -245,23 +242,26 @@ if __name__=='__main__':
             'label': 'XGBoost-selectKBest'
         },
         '5':{
-            'pickle_name': 'decision_tree/approach_2.pkl',
+            'pickle_name': 'decision_tree/approach_4.pkl',
             'all_feature': True,
-            'model_type': 'approach_2',
+            'model_type': 'approach_4',
             'data_path': q4_path,
             'color': 'plum', 
-            'label': 'Decision Tree'              
+            'label': 'MLP'              
         }
     }
 
-    # plot_roc(X, y, five_curves)
+    
 
     q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
     q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
 
-    # plot_goal_rate(X, y, five_curves, q2_path, q4_path)
-    # plot_cumulative_rate(X, y, five_curves, q2_path, q4_path)
-    plot_calibration(X, y, five_curves, q2_path, q4_path)
+    season_type = '2019/20 regular season test set'
+
+    plot_roc(X, y, five_curves, q2_path, q4_path,season_type)
+    plot_goal_rate(X, y, five_curves, q2_path, q4_path,season_type)
+    plot_cumulative_rate(X, y, five_curves, q2_path, q4_path,season_type)
+    plot_calibration(X, y, five_curves, q2_path, q4_path,season_type)
 
     # 7 plots (regular; playoffs)
     # 1. different DF
