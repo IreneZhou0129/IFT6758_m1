@@ -15,6 +15,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import accuracy_score, roc_curve, auc
+from sklearn.neural_network import MLPClassifier
+
 
 # ift6758/data/milestone2/q6_baseline
 import sys
@@ -213,6 +215,44 @@ def approach_4(X_train, X_test, y_train, y_test, model_type, file_name):
 
     return clf, params, metrics_dict
 
+####################################################################################
+# Approach 4 - 2.0 : MLP
+####################################################################################
+@log_experiment
+def mlp(X_train, X_test, y_train, y_test, model_type, file_name):
+    clf = MLPClassifier(hidden_layer_sizes=(15,), 
+                        # activation='relu',
+                        solver='adam', 
+                        alpha=1e-5,
+                        max_iter=300,
+                        random_state=1
+                       )
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+
+    fpr, tpr, thr = roc_curve(y_test, y_pred)
+    roc_auc = auc(fpr, tpr)
+
+    metrics_dict = {
+        'model_type': model_type,
+        'accuracy': accuracy,
+        'roc_auc': roc_auc
+    }
+
+    # params = clf.best_params_
+    params = {
+        'hidden_layer':'(15,)',
+        'solver':'adam',
+        'alpha':'1e-5',
+        'max_iter':'300',
+        'random_state':'1'
+    }
+
+    return clf, params, metrics_dict
+
 
 def plot_q6_2():
     X, y = read_all_features()
@@ -228,30 +268,35 @@ def main():
                                                         test_size=0.20,
                                                         random_state=50)
     
-    approach_1(X_train, X_test,
-               y_train, y_test,
-               'decision_tree',
-               'models/decision_tree/approach_1.pkl')
+    # approach_1(X_train, X_test,
+    #            y_train, y_test,
+    #            'decision_tree',
+    #            'models/decision_tree/approach_1.pkl')
 
     
-    approach_2(X_train, X_test,
-               y_train, y_test,
-               'decision_tree',
-               'models/decision_tree/approach_2.pkl')
+    # approach_2(X_train, X_test,
+    #            y_train, y_test,
+    #            'decision_tree',
+    #            'models/decision_tree/approach_2.pkl')
 
     
-    approach_3(X_train, X_test,
-               y_train, y_test,
-               'decision_tree',
-               'models/decision_tree/approach_3.pkl')
+    # approach_3(X_train, X_test,
+    #            y_train, y_test,
+    #            'decision_tree',
+    #            'models/decision_tree/approach_3.pkl')
 
     
-    approach_4(X_train, X_test,
+    # approach_4(X_train, X_test,
+    #            y_train, y_test,
+    #            'decision_tree',
+    #            'models/decision_tree/approach_4.pkl')    
+
+    mlp(X_train, X_test,
                y_train, y_test,
-               'decision_tree',
-               'models/decision_tree/approach_4.pkl')    
+               'MLP',
+               'models/part6/mlp.pkl')
 
 if __name__ == '__main__':
 
-    # main()
-    plot_q6_2()
+    main()
+    # plot_q6_2()
