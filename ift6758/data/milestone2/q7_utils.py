@@ -8,8 +8,10 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
 # customized APIs
-from q5 import q5_3_selectKbest
-from q6_baseline import get_prob, read_all_features
+from q6_baseline import get_prob, \
+                        get_percentile, \
+                        get_rate, \
+                        read_all_features
 
 def plot_roc(X, y, five_curves):
 
@@ -66,19 +68,33 @@ def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
 
     ax_calibration_curve = fig.add_subplot(gs[:2, :2])    
 
-    probs = get_prob(X, y, model_type)
-    is_goal = probs[:,1]   
-    perc_df = get_percentile(X, y, probs)
-    # curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
-
-    goal_rate_df = get_rate(perc_df)
-    plt.plot(
-        goal_rate_df['Percentile']/100,
-        goal_rate_df['Rate']/100,
-        # label = curve_label,
-        # color = color
-    )   
+    for k,v in five_curves.items():
+        print(f'*************************\nrunning {k}\n*************************')
        
+        X, y = read_all_features(v['data_path'])
+
+        model_type = v['model_type']
+
+        # find right X
+        if v['all_feature'] == False:
+            X = X[v['feature']]        
+        
+        color = v['color']
+        curve_label = v['label']
+        
+        probs = get_prob(X, y, model_type)
+        is_goal = probs[:,1]   
+        perc_df = get_percentile(X, y, probs)
+        # curve_label = f[0] if len(f) == 1 else 'Distance and Angle from Net'              
+
+        goal_rate_df = get_rate(perc_df)
+        plt.plot(
+            goal_rate_df['Percentile']/100,
+            goal_rate_df['Rate']/100,
+            label = curve_label,
+            color = color
+        )   
+        
     plt.title('Goal rate', fontsize=20)
     plt.legend(loc=2,prop={'size': 16})
     plt.rc('xtick', labelsize=16)
@@ -86,6 +102,7 @@ def plot_goal_rate(X, y, five_curves, q2_path, q4_path):
     plt.ylabel('Goal Rate', fontsize=20)
     plt.xlabel('Shot Probability Model Percentile', fontsize=20)    
     plt.grid(True)
+    plt.show()
 
 
 if __name__=='__main__':
