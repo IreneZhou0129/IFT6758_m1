@@ -6,11 +6,13 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+from sklearn.calibration import calibration_curve, CalibrationDisplay
 
 # customized APIs
 from q6_baseline import get_prob, \
                         get_percentile, \
                         get_rate, \
+                        get_clf, \
                         read_all_features
 
 def plot_roc(X, y, five_curves):
@@ -148,6 +150,58 @@ def plot_cumulative_rate(X, y, five_curves, q2_path, q4_path):
     plt.grid(True)
     plt.show()
 
+def plot_calibration(X, y, five_curves, q2_path, q4_path):
+    '''
+    https://scikit-learn.org/stable/auto_examples/calibration/plot_calibration_curve.html
+    '''
+
+    fig = plt.figure(figsize=(20, 20))
+    gs = GridSpec(4, 2)
+
+    ax_calibration_curve = fig.add_subplot(gs[:2, :2]) 
+
+    for k,v in five_curves.items():
+        print(f'*************************\nrunning {k}\n*************************')
+
+        X, y = read_all_features(v['data_path'])
+
+        model_type = v['model_type']
+
+        # find right X
+        if v['all_feature'] == False:
+            X = X[v['feature']]        
+        
+        color = v['color']
+        curve_label = v['label']
+
+        X_train, X_test, y_train, y_test = train_test_split(X,
+                                                            y,
+                                                            test_size=0.20,
+                                                            random_state=50)
+        clf = get_clf(X_train, X_test,model_type,y_train)   
+
+        y_train = y_train.values.ravel()
+        clf.fit(X_train, y_train)          
+            
+        display = CalibrationDisplay.from_estimator(
+                    clf,
+                    X_test,
+                    y_test,
+                    n_bins=50,
+                    ax=ax_calibration_curve,
+                    label = curve_label,
+                    color = color,
+            )
+    
+    ax_calibration_curve.grid()
+    plt.title("Calibration plots", fontsize=20)
+    plt.legend(loc=2,prop={'size': 16})
+    plt.rc('xtick', labelsize=16)
+    plt.rc('ytick', labelsize=16)
+    plt.ylabel('Fraction of positives', fontsize=20)
+    plt.xlabel('Mean predicted probability', fontsize=20)
+    plt.show()    
+
 if __name__=='__main__':
     q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
     q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
@@ -206,8 +260,8 @@ if __name__=='__main__':
     q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
 
     # plot_goal_rate(X, y, five_curves, q2_path, q4_path)
-    plot_cumulative_rate(X, y, five_curves, q2_path, q4_path)
-
+    # plot_cumulative_rate(X, y, five_curves, q2_path, q4_path)
+    plot_calibration(X, y, five_curves, q2_path, q4_path)
 
     # 7 plots (regular; playoffs)
     # 1. different DF
