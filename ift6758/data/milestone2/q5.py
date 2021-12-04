@@ -266,7 +266,7 @@ def q5_3_var_threshold(X, y, experiment):
     experiment.end()
 
 
-def q5_3_selectKbest(X, y, experiment):  
+def q5_3_selectKbest(X, y, experiment=None):  
     """
     Univariate Feature Selection.
     ref:
@@ -284,18 +284,19 @@ def q5_3_selectKbest(X, y, experiment):
     
     model = q5_3(X_new, y, experiment)
     
-    experiment.log_dataset_hash(X_new)
+    # experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
     # model.save_model("models/q5_3_selectKBest.model")
     # model_name = "XGBoost Model (q5_3_selectKbest)"
     # experiment.log_model(model_name, "models/q5_3_selectKBest.model")
 
-    model.save_model("models/q5_3_selectKBest.pkl")
-    model_name = "XGBoost Model (q5_3_selectKbest)"
-    experiment.log_model(model_name, "models/q5_3_selectKBest.pkl")
+    # model.save_model("models/q5_3_selectKBest.pkl")
+    # model_name = "XGBoost Model (q5_3_selectKbest)"
+    # experiment.log_model(model_name, "models/q5_3_selectKBest.pkl")
 
-    experiment.end()
+    # experiment.end()
+    return model
 
 
 # https://scikit-learn.org/stable/modules/feature_selection.html#feature-selection-using-selectfrommodel
