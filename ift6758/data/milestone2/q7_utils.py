@@ -253,10 +253,16 @@ if __name__=='__main__':
 
     
 
-    q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
-    q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
+    # q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
+    # q4_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
 
-    season_type = '2019/20 regular season test set'
+    q2_path_playoff = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple_playoffs.csv'
+    q4_path_playoff = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical_playoffs.csv'
+
+    season_type = '2019/20 playoffs test set'
+
+    q2_path = q2_path_playoff
+    q4_path = q4_path_playoff
 
     plot_roc(X, y, five_curves, q2_path, q4_path,season_type)
     plot_goal_rate(X, y, five_curves, q2_path, q4_path,season_type)
