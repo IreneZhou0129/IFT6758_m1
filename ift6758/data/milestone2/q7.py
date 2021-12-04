@@ -130,17 +130,23 @@ if __name__ == '__main__':
     # create test dataset csv
     # ==============================
     
+    # regular season
     file_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_JSON_data/regular_season'
-
     # for curve 1, 2, and 3
     q2_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple.csv'
     # for curve 4 and 5
     dest_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical.csv'
+
+    # playoffs
+    playoff_file_path = '/Users/xiaoxinzhou/Documents/IFT6758_M2_JSON_data/playoffs'
+    q2_path_playoff = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_simple_playoffs.csv'
+    q4_path_playoff = '/Users/xiaoxinzhou/Documents/IFT6758_M2_CSV_data/test_data_categorical_playoffs.csv'
+
     years = [2019]
 
-    # create_csv('simple', file_path, dest_path, years)
+    # create_csv('advanced', playoff_file_path, q4_path_playoff, years)
 
-    X, y = read_all_features(dest_path)
+    # X, y = read_all_features(dest_path)
     main(X,y)
 
 
