@@ -196,9 +196,9 @@ def q5_2_tuned(X, y, experiment):
     experiment.log_metrics(metrics_dict)
 
     # # save the model to disk
-    model.save_model("models/q5_2_tuned.pkl")
+    model.save_model("models/q5_2_tuned.json")
     model_name = "XGBoost Model (q5_2_tuned)"
-    experiment.log_model(model_name, "models/q5_2_tuned.pkl")
+    experiment.log_model(model_name, "models/q5_2_tuned.json")
     experiment.end()    
 
     return None
@@ -260,9 +260,9 @@ def q5_3_var_threshold(X, y, experiment):
     experiment.log_dataset_hash(sel_reduced)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    model.save_model("models/q5_3_var_threshold.model")
+    model.save_model("models/q5_3_var_threshold.json")
     model_name = "XGBoost Model (var threshold)"
-    experiment.log_model(model_name, "models/q5_3_var_threshold.model")
+    experiment.log_model(model_name, "models/q5_3_var_threshold.json")
     experiment.end()
 
 
@@ -287,13 +287,9 @@ def q5_3_selectKbest(X, y, experiment=None):
     # experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    # model.save_model("models/q5_3_selectKBest.model")
-    # model_name = "XGBoost Model (q5_3_selectKbest)"
-    # experiment.log_model(model_name, "models/q5_3_selectKBest.model")
-
-    # model.save_model("models/q5_3_selectKBest.pkl")
-    # model_name = "XGBoost Model (q5_3_selectKbest)"
-    # experiment.log_model(model_name, "models/q5_3_selectKBest.pkl")
+    model.save_model("models/q5_3_selectKBest.json")
+    model_name = "XGBoost Model (q5_3_selectKbest)"
+    experiment.log_model(model_name, "models/q5_3_selectKBest.json")
 
     # experiment.end()
     return model
@@ -313,9 +309,9 @@ def q5_3_selectFromModel(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    model.save_model("models/q5_3_selectFromModel.model")
+    model.save_model("models/q5_3_selectFromModel.json")
     model_name = "XGBoost Model (selectFromModel)"
-    experiment.log_model(model_name, "models/q5_3_selectFromModel.model")
+    experiment.log_model(model_name, "models/q5_3_selectFromModel.json")
     experiment.end()
 
 
@@ -332,9 +328,9 @@ def q5_3_extraTree(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    model.save_model("models/q5_3_extraTree.model")
+    model.save_model("models/q5_3_extraTree.json")
     model_name = "XGBoost Model (extraTree)"
-    experiment.log_model(model_name, "models/q5_3_extraTree.model")
+    experiment.log_model(model_name, "models/q5_3_extraTree.json")
     experiment.end()
 
 
@@ -361,9 +357,9 @@ def q5_3_rfe_logreg(X, y, experiment):
     experiment.log_dataset_hash(X_new)
     
     # https://github.com/comet-ml/comet-examples/blob/master/model_registry/xgboost_seldon_aws/xgboost_seldon_aws.ipynb
-    model.save_model("models/q5_3_rfe_logreg.model")
+    model.save_model("models/q5_3_rfe_logreg.json")
     model_name = "XGBoost Model (RFE)"
-    experiment.log_model(model_name, "models/q5_3_rfe_logreg.model")
+    experiment.log_model(model_name, "models/q5_3_rfe_logreg.json")
     experiment.end()
 
 
@@ -385,16 +381,16 @@ def main():
     # Question 2
     # =================
     # q5_2(X, y, experiment)
-    q5_2_tuned(X, y, experiment)
+    # q5_2_tuned(X, y, experiment) # recreated json model: Done on Dec 17th
 
     # =================
     # Question 3
     # =================
-    # q5_3_var_threshold(X, y, experiment)    
-    q5_3_selectKbest(X, y, experiment)
-    # q5_3_selectFromModel(X, y, experiment)
-    # q5_3_extraTree(X, y, experiment)
-    # q5_3_rfe_logreg(X, y, experiment)
+    # q5_3_var_threshold(X, y, experiment)    # Done
+    # q5_3_selectKbest(X, y, experiment) # Done
+    # q5_3_selectFromModel(X, y, experiment) # Done
+    # q5_3_extraTree(X, y, experiment) # Done
+    q5_3_rfe_logreg(X, y, experiment)
 
 if __name__ == '__main__':
     main()
