@@ -385,7 +385,7 @@ def main():
     # Question 2
     # =================
     # q5_2(X, y, experiment)
-    # q5_2_tuned(X, y, experiment)
+    q5_2_tuned(X, y, experiment)
 
     # =================
     # Question 3
