@@ -196,9 +196,9 @@ def q5_2_tuned(X, y, experiment):
     experiment.log_metrics(metrics_dict)
 
     # # save the model to disk
-    model.save_model("models/q5_2_tuned.model")
+    model.save_model("models/q5_2_tuned.pkl")
     model_name = "XGBoost Model (q5_2_tuned)"
-    experiment.log_model(model_name, "models/q5_2_tuned.model")
+    experiment.log_model(model_name, "models/q5_2_tuned.pkl")
     experiment.end()    
 
     return None
